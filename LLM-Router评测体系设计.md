@@ -1,5 +1,5 @@
-![[Pasted image 20261116220355.png]]
 
+![[Pasted image 20261116220355.png]]
 评估层级high level划分：
 - **Coding Capability（代码处理能力）**：模型能够解决什么类型的开发问题。
 - **Agentic Capability（自主任务执行能力）**：模型能否自主规划、调用工具并完成任务。
