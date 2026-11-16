@@ -1,5 +1,6 @@
 
-![[Pasted image 20261116220355.png]]
+<img width="2321" height="2001" alt="image" src="https://github.com/user-attachments/assets/e8f7f38f-0aa0-46a9-9277-c752be620bea" />
+
 评估层级high level划分：
 - **Coding Capability（代码处理能力）**：模型能够解决什么类型的开发问题。
 - **Agentic Capability（自主任务执行能力）**：模型能否自主规划、调用工具并完成任务。
@@ -32,7 +33,9 @@
 测试样本：2035
 文件格式：18
 任务类型：44
-![[Pasted image 20261116221742.png]]
+
+<img width="2342" height="1116" alt="image" src="https://github.com/user-attachments/assets/8492ca11-a353-463a-a761-83b51b355e27" />
+
 
 它主要评测两种任务：
 
@@ -93,7 +96,8 @@ Terminal-Bench 2.1 于 2026 年 5 月 6 日发布，对原有任务的验收逻�
 
 每道题都具有独立的运行环境和验收机制，不仅仅是一段 Prompt。
 
-![[Pasted image 20261116225823.png]]
+<img width="1557" height="2031" alt="image" src="https://github.com/user-attachments/assets/b7b5b27c-43f1-4d43-bd00-1c6f0c671f1d" />
+
 
 ## **Terminal-Bench 如何评分？**
 
@@ -102,6 +106,7 @@ Terminal-Bench 的核心评分原则是 **Outcome-based Evaluation（基于最�
 它并不严格要求 Agent 按照预先设定的操作步骤完成任务，而是验证最终交付结果是否符合要求。
 
 GitHub
+<img width="1185" height="221" alt="image" src="https://github.com/user-attachments/assets/a5924a84-0c98-42c5-b800-2d137a268c0f" />
 
 例如，要求 Agent 修复一个服务启动失败的问题，不管它使用 Python、Shell 还是其他工具，只要最终通过验收，即可判定任务成功。
 
