@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>大模型推理分享 · 从训练流程到推理测试</title>
+<script>document.documentElement.className='js'</script>
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/base.css">
+<link rel="stylesheet" href="assets/themes/engineering-whiteprint.css">
+<link rel="stylesheet" href="assets/animations.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="progress-track"><span id="progressBar"></span></div>
+
+<!-- ═══════════ 顶部栏 ═══════════ -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="#top">大模型推理分享</a>
+    <nav class="chapnav" id="chapNav">
+      <a href="#ch1"><span class="n">一</span>流程概述</a>
+      <a href="#ch2"><span class="n">二</span>推理专题</a>
+      <a href="#ch3"><span class="n">三</span>推理测试</a>
+      <a href="#ch4"><span class="n">四</span>趋势展望</a>
+    </nav>
+    <button class="toc-btn" id="tocBtn" type="button"><span class="bars"></span>目录</button>
+  </div>
+</header>
+
+<div class="page">
+
+<!-- ═══════════ 封面 ═══════════ -->
+<section class="hero" id="top">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <p class="kicker" data-anim="fade-up">技术分享 · LLM INFERENCE</p>
+        <h1 data-anim="fade-up">大模型推理<br><em>从流程到测试</em></h1>
+        <p class="lede" data-anim="fade-up">从数据准备与训练流程讲起，进入推理的两个阶段与引擎内部结构，再落到性能、精度、压力三类测试和三个压测用例，最后看推理的发展趋势。</p>
+        <div class="hero-meta" data-anim="fade-up">
+          <span class="pill">流程概述</span>
+          <span class="pill">推理专题</span>
+          <span class="pill">推理测试</span>
+          <span class="pill">趋势展望</span>
+        </div>
+      </div>
+      <div data-anim="fade-right">
+        <nav class="agenda">
+          <div class="agenda-cap">核心内容</div>
+          <a href="#ch1"><span class="no">一</span><span class="ti">大模型流程概述</span><span class="de">数据准备 · 预训练 · 微调 · 后训练 · 强化学习</span></a>
+          <a href="#ch2"><span class="no">二</span><span class="ti">推理专题</span><span class="de">什么是推理 · 两个主要阶段 · 推理流程 · 核心概念</span></a>
+          <a href="#ch3"><span class="no">三</span><span class="ti">推理测试</span><span class="de">性能测试 · 精度测试 · 压力测试 · 三个压测用例</span></a>
+          <a href="#ch4"><span class="no">四</span><span class="ti">大模型推理发展趋势</span><span class="de">推理计算 · 生成加速 · 分工协作</span></a>
+        </nav>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     一、大模型流程概述
+     ══════════════════════════════════════════════════════════ -->
+<section class="chapter" id="ch1">
+  <div class="wrap">
+    <div class="chapter-band" data-anim="fade-up">
+      <span class="cn">01</span>
+      <h2>大模型流程概述</h2>
+      <span class="sub">Chapter 01 / Pipeline</span>
+    </div>
+
+    <!-- 1.1 -->
+    <article class="sec" id="s-flow">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">1.1</span>
+        <h3>整体流程与概念关系</h3>
+        <a class="anchor" href="#s-flow">#s-flow</a>
+      </div>
+      <figure class="figure wide" data-anim="fade-up">
+        <div class="frame"><img src="assets/images/flow-overview.png" alt="大模型整体流程：数据准备 → 预训练 → 微调 → 偏好优化/强化学习 → 推理"></div>
+        <figcaption>数据准备 → 预训练 → 微调 → 偏好优化 / 强化学习 → 推理</figcaption>
+      </figure>
+    </article>
+
+    <!-- 1.2 -->
+    <article class="sec" id="s-data">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">1.2</span>
+        <h3>数据准备：模型学习的原材料</h3>
+        <a class="anchor" href="#s-data">#s-data</a>
+      </div>
+      <p data-anim="fade-up">正式训练之前，需要收集和处理数据。</p>
+      <p data-anim="fade-up">常见数据包括网页、书籍、论文、代码和问答内容；多模态模型还可能使用图片、音频和视频。</p>
+      <p data-anim="fade-up">数据准备通常涉及：</p>
+      <div class="cards c5" data-anim="fade-up">
+        <div class="c"><span class="no">01</span><h4>清洗</h4><p>去除乱码、无意义内容和低质量样本。</p></div>
+        <div class="c"><span class="no">02</span><h4>去重</h4><p>减少重复数据，避免模型过度学习某些内容。</p></div>
+        <div class="c"><span class="no">03</span><h4>过滤</h4><p>处理敏感信息、违规内容等。</p></div>
+        <div class="c"><span class="no">04</span><h4>分词</h4><p>把原始文本转换成 Token。</p></div>
+        <div class="c"><span class="no">05</span><h4>划分数据集</h4><p>区分训练集、验证集和测试集，减少评测数据泄漏。</p></div>
+      </div>
+      <p data-anim="fade-up">可以用一句话概括：</p>
+      <div class="pull" data-anim="fade-up"><span class="qm">“</span>模型能力不仅取决于参数量，也取决于训练数据的质量、覆盖范围和组织方式。</div>
+    </article>
+
+    <!-- 1.3 -->
+    <article class="sec" id="s-pretrain">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">1.3</span>
+        <h3>预训练：建立通用能力</h3>
+        <a class="anchor" href="#s-pretrain">#s-pretrain</a>
+      </div>
+      <p data-anim="fade-up">预训练通常从初始化后的模型开始，使用大规模数据学习语言规律和知识关联。</p>
+      <p data-anim="fade-up">对于常见的自回归语言模型，核心任务是：</p>
+      <div class="key" data-anim="fade-up"><span class="lbl">核心任务</span>给定前面的 Token，预测下一个 Token。</div>
+
+      <p class="sub">预训练产出什么？</p>
+      <p data-anim="fade-up">预训练通常产出一个<b>基础模型（Base Model）</b>。</p>
+      <p data-anim="fade-up">它可能已经具备较强的文本生成能力，但还不一定能稳定地：</p>
+      <ul class="bul" data-anim="fade-up">
+        <li>理解并遵循用户指令。</li>
+        <li>按指定格式回答。</li>
+        <li>保持自然的多轮对话。</li>
+        <li>处理安全边界和不适当请求。</li>
+      </ul>
+      <div class="note" data-anim="fade-up"><span>例如</span><span>用户输入“解释什么是数据库”，基础模型可能继续补写这句话，而不是直接给出清晰的解释。</span></div>
+    </article>
+
+    <!-- 1.4 -->
+    <article class="sec" id="s-sft">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">1.4</span>
+        <h3>微调：让已有模型适应具体需求</h3>
+        <a class="anchor" href="#s-sft">#s-sft</a>
+      </div>
+      <p data-anim="fade-up">微调是在已有模型基础上，使用新的数据继续训练。</p>
+      <p data-anim="fade-up">相比从头预训练，微调通常需要更少的数据和算力，因此很多企业会选择已有模型作为起点。</p>
+      <p class="sub">常见目标包括：</p>
+      <div class="tbl-wrap" data-anim="fade-up">
+        <table class="t">
+          <thead><tr><th>微调目标</th><th>示例</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">遵循指令</th><td>根据要求总结、翻译、生成代码</td></tr>
+            <tr><th scope="row">适应领域</th><td>理解金融术语、处理行业文档</td></tr>
+            <tr><th scope="row">规范输出</th><td>稳定生成指定结构的 JSON</td></tr>
+            <tr><th scope="row">完成特定任务</th><td>分类、信息抽取、测试用例生成</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <!-- 1.5 -->
+    <article class="sec" id="s-post">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">1.5</span>
+        <h3>后训练：改善回答行为和任务表现</h3>
+        <a class="anchor" href="#s-post">#s-post</a>
+      </div>
+      <p data-anim="fade-up">后训练是预训练之后的一组优化过程，没有统一固定的配方。常见内容包括：</p>
+      <ul class="bul tight" data-anim="fade-up">
+        <li>指令微调。</li>
+        <li>偏好优化。</li>
+        <li>强化学习。</li>
+        <li>安全行为训练。</li>
+        <li>推理、工具调用等能力训练。</li>
+      </ul>
+
+      <p class="sub">为什么做完 SFT，还可能需要继续优化？</p>
+      <p data-anim="fade-up">SFT 让模型学习参考答案，但实际回答中仍可能出现：</p>
+      <ul class="bul" data-anim="fade-up">
+        <li>答非所问或表达冗长。</li>
+        <li>看似合理却缺乏依据。</li>
+        <li>不遵循用户要求。</li>
+        <li>在复杂任务上表现不稳定。</li>
+      </ul>
+      <div class="key" data-anim="fade-up"><span class="lbl">因此</span>需要进一步告诉模型：多个回答中，哪些更好，以及“好”的标准是什么。</div>
+
+      <p class="sub">概念对照</p>
+      <div class="tbl-wrap" data-anim="fade-up">
+        <table class="t">
+          <thead><tr><th>概念</th><th>基础解释</th><th>主要目的</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">训练</th><td>使用数据和优化算法调整模型参数的过程</td><td>让模型获得或改善能力</td></tr>
+            <tr><th scope="row">预训练</th><td>在大规模数据上进行基础训练</td><td>建立通用语言、知识和任务能力</td></tr>
+            <tr><th scope="row">微调</th><td>在已有模型基础上继续训练</td><td>适应特定任务、领域或行为要求</td></tr>
+            <tr><th scope="row">后训练</th><td>预训练完成后的一系列能力与行为优化</td><td>改善指令遵循、回答质量、安全性和推理能力</td></tr>
+            <tr><th scope="row">推理</th><td>使用训练好的模型处理输入并生成输出</td><td>把模型能力提供给用户或业务系统</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <!-- 1.6 -->
+    <article class="sec" id="s-rl">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">1.6</span>
+        <h3>强化学习与推理能力</h3>
+        <a class="anchor" href="#s-rl">#s-rl</a>
+      </div>
+      <p data-anim="fade-up">强化学习的基本思路是：</p>
+      <div class="key" data-anim="fade-up"><span class="lbl">基本思路</span>模型生成答案 → 获得奖励或评分 → 根据反馈调整参数。</div>
+      <p data-anim="fade-up">奖励可以来自人工偏好，也可以来自可验证的结果，例如：</p>
+      <ul class="bul" data-anim="fade-up">
+        <li>数学答案是否正确。</li>
+        <li>生成的代码是否通过测试。</li>
+        <li>工具调用是否完成目标。</li>
+        <li>输出是否满足格式约束。</li>
+      </ul>
+      <div class="pull" data-anim="fade-up">它可以帮助模型改善任务策略和推理表现，但效果取决于奖励设计和训练方法。训练后仍需要评测，不能仅凭奖励上升就认定实际能力全面提升。</div>
+    </article>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     二、推理专题
+     ══════════════════════════════════════════════════════════ -->
+<section class="chapter" id="ch2">
+  <div class="wrap">
+    <div class="chapter-band" data-anim="fade-up">
+      <span class="cn">02</span>
+      <h2>推理：把训练好的模型用起来</h2>
+      <span class="sub">Chapter 02 / Inference</span>
+    </div>
+
+    <!-- 2.1 -->
+    <article class="sec" id="s-what">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">2.1</span>
+        <h3>什么是推理？</h3>
+        <a class="anchor" href="#s-what">#s-what</a>
+      </div>
+      <p data-anim="fade-up">推理是模型收到输入后，使用已有参数生成输出的过程。</p>
+      <p data-anim="fade-up">例如：</p>
+      <div class="io" data-anim="fade-up">
+        <div class="l">输入</div><div class="v">请总结这份报告。</div>
+        <div class="l">输出</div><div class="v">报告主要包含以下三个方面……</div>
+      </div>
+      <div class="key" data-anim="fade-up"><span class="lbl">关键区别</span>训练通常更新参数；推理通常只读取参数。</div>
+      <p data-anim="fade-up">因此，普通对话不会自动让模型“学会”新的知识并写入权重。多轮对话主要依靠当前上下文；产品中的长期记忆通常依赖额外的存储和检索机制。</p>
+    </article>
+
+    <!-- 2.2 -->
+    <article class="sec" id="s-stages">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">2.2</span>
+        <h3>推理的两个主要阶段</h3>
+        <a class="anchor" href="#s-stages">#s-stages</a>
+      </div>
+      <p data-anim="fade-up">对于常见的自回归语言模型，推理可以分为：</p>
+      <div class="tbl-wrap" data-anim="fade-up">
+        <table class="t">
+          <thead><tr><th>阶段</th><th>做什么</th><th>主要关注点</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Prefill</th><td>处理输入上下文，建立后续生成所需的状态</td><td>输入长度、首 Token 延迟</td></tr>
+            <tr><th scope="row">Decode</th><td>基于上下文逐步生成输出 Token</td><td>生成速度、逐 Token 延迟</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p data-anim="fade-up">模型通常会使用 <b>KV Cache</b> 保存已计算的部分中间结果，减少后续生成时的重复计算。</p>
+      <div class="key" data-anim="fade-up"><span class="lbl">一句话总结</span>Prefill 处理“用户已经说了什么”，Decode 逐步生成“模型接下来要说什么”。</div>
+    </article>
+
+    <!-- 2.3 -->
+    <article class="sec" id="s-pipeline">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">2.3</span>
+        <h3>推理流程</h3>
+        <a class="anchor" href="#s-pipeline">#s-pipeline</a>
+      </div>
+      <figure class="figure wide" data-anim="fade-up">
+        <div class="frame"><img src="assets/images/inference-pipeline.png" alt="推理流程：用户输入问题 → 转换为 Token → Prefill 处理输入 → Decode 逐步生成 → 返回回答"></div>
+        <figcaption>用户输入问题 → 转换为 Token → Prefill 处理输入 → Decode 逐步生成 → 返回回答</figcaption>
+      </figure>
+    </article>
+
+    <!-- 2.4 -->
+    <article class="sec" id="s-concepts">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">2.4</span>
+        <h3>核心概念</h3>
+        <a class="anchor" href="#s-concepts">#s-concepts</a>
+      </div>
+      <div class="tbl-wrap" data-anim="fade-up">
+        <table class="t">
+          <thead><tr><th>核心概念</th><th>说明</th><th>为什么重要</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Token：处理单位</th><td>模型把文本拆成小片段，逐个处理；一个 Token 不一定等于一个字</td><td>输入长度、输出长度和处理速度通常按 Token 计算</td></tr>
+            <tr><th scope="row">上下文：本次可参考的信息</th><td>包含系统指令、用户问题、历史对话和补充资料</td><td>模型能参考多少内容，受上下文窗口限制</td></tr>
+            <tr><th scope="row">Prefill：处理输入</th><td>模型先计算整段输入，为生成回答做好准备</td><td>输入越长，通常计算量越大，首字等待时间越长</td></tr>
+            <tr><th scope="row">Decode：逐步生成</th><td>模型通常一次生成一个 Token，再根据已有内容继续生成</td><td>输出越长，通常完成整个回答所需时间越长</td></tr>
+            <tr><th scope="row">KV Cache：缓存已有计算</th><td>保存前文的部分计算结果，避免每生成一个 Token 都重新计算全部前文</td><td>加快生成，但会占用显存</td></tr>
+            <tr><th scope="row">do_sample：采样</th><td>模型给出多个候选及其概率，再按规则选择一个</td><td>影响答案的多样性和重复请求时的一致性</td></tr>
+            <tr><th scope="row">批处理：同时处理多个请求</th><td>推理服务把多个用户请求组织起来，共同使用计算资源</td><td>提高吞吐量，但高负载下可能增加等待时间</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <!-- 2.5 -->
+    <article class="sec" id="s-engine">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">2.5</span>
+        <h3>推理引擎架构</h3>
+        <a class="anchor" href="#s-engine">#s-engine</a>
+      </div>
+      <figure class="figure tall centered" data-anim="fade-up">
+        <div class="frame" data-zoom="assets/images/engine-architecture.png">
+          <img src="assets/images/engine-architecture.png" alt="推理引擎架构：API Server、Engine Core（请求队列、Scheduler、KV Cache Manager）、GPU Worker（Prefill、Decode、采样）、输出处理与流式返回">
+          <button class="zoom" type="button">点击放大查看完整流程图</button>
+        </div>
+        <figcaption>Engine Core：调度与缓存管理 · GPU Worker：模型计算 · API Server：流式返回新增内容</figcaption>
+      </figure>
+    </article>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     三、推理测试
+     ══════════════════════════════════════════════════════════ -->
+<section class="chapter" id="ch3">
+  <div class="wrap">
+    <div class="chapter-band" data-anim="fade-up">
+      <span class="cn">03</span>
+      <h2>推理测试</h2>
+      <span class="sub">Chapter 03 / Testing</span>
+    </div>
+
+    <!-- 3.1 -->
+    <article class="sec" id="s-cat">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">3.1</span>
+        <h3>推理测试分类</h3>
+        <a class="anchor" href="#s-cat">#s-cat</a>
+      </div>
+      <div class="tbl-wrap" data-anim="fade-up">
+        <table class="t">
+          <thead><tr><th>分类</th><th>核心目标</th><th>通俗理解</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">性能测试</th><td>衡量指定负载下的速度和资源效率</td><td>正常使用时，回答快不快？</td></tr>
+            <tr><th scope="row">精度测试</th><td>衡量答案质量和任务完成能力</td><td>回答对不对、任务能否完成？</td></tr>
+            <tr><th scope="row">压力测试</th><td>探索容量边界、过载表现与恢复能力</td><td>用户太多时，会发生什么？</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <!-- 3.2 -->
+    <article class="sec" id="s-perf">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">3.2</span>
+        <h3>性能测试</h3>
+        <a class="anchor" href="#s-perf">#s-perf</a>
+      </div>
+      <div class="tbl-wrap" data-anim="fade-up">
+        <table class="t">
+          <thead><tr><th>项目</th><th>内容</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">测试方法</th><td>固定模型、输入和输出长度，逐步改变并发量或请求速率；对比不同硬件、量化方式和推理配置；分别覆盖短输入、长输入、短输出、长输出</td></tr>
+            <tr><th scope="row">测试工具</th><td><b>vLLM bench serve</b>：测量在线推理服务的延迟与吞吐量；<b>Locust</b>：模拟自定义业务请求与负载</td></tr>
+            <tr><th scope="row">测试指标</th><td><b>TTFT</b>：多久开始回答；<b>TPOT / ITL</b>：生成过程中每个 Token 的耗时；<b>E2E 延迟</b>：整个请求耗时；<b>吞吐量</b>：每秒完成请求数或输出 Token 数；<b>资源占用</b>：GPU 利用率、显存</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p data-anim="fade-up">vLLM 的服务基准测试支持控制请求速率和最大并发，并统计 Token 吞吐量及延迟指标。</p>
+      <div class="note" data-anim="fade-up"><span><b>示例</b></span><span>输入 1,024 Token、输出目标 256 Token，对比 1、8、16、32 并发下的延迟和吞吐量。</span></div>
+    </article>
+
+    <!-- 3.3 -->
+    <article class="sec" id="s-acc">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">3.3</span>
+        <h3>精度测试</h3>
+        <a class="anchor" href="#s-acc">#s-acc</a>
+      </div>
+      <p data-anim="fade-up">这里的“精度”指<b>答案和任务质量</b>，与 FP16、INT8 等数值精度区分。</p>
+      <div class="tbl-wrap" data-anim="fade-up">
+        <table class="t">
+          <thead><tr><th>项目</th><th>内容</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">测试方法</th><td>使用标准数据集和业务用例；把输出与参考答案比较；代码任务执行测试用例；开放问答结合评分规则、人工抽检或模型裁判</td></tr>
+            <tr><th scope="row">测试工具</th><td><b>lm-evaluation-harness</b>：标准语言模型基准评测；<b>EvalScope</b>：组织模型评测及结果分析；业务场景可补充自定义评测脚本</td></tr>
+            <tr><th scope="row">测试指标</th><td><b>Accuracy</b>：答对比例；<b>EM / F1</b>：完全匹配或答案重合程度；<b>Pass@k</b>：代码任务在 k 次候选中的通过表现；<b>任务成功率</b>：是否完成业务目标；<b>事实正确性、指令遵循率</b></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p data-anim="fade-up">lm-evaluation-harness 和 EvalScope 均提供语言模型评测能力，具体任务需要选择相应的评测配置。<a href="https://github.com/EleutherAI/lm-evaluation-harness" target="_blank" rel="noopener">GitHub</a></p>
+      <div class="note" data-anim="fade-up"><span><b>示例</b></span><span>使用 GSM8K 测数学问题、HumanEval 测代码生成，再加入内部业务问答用例。</span></div>
+    </article>
+
+    <!-- 3.4 -->
+    <article class="sec" id="s-dataset">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">3.4</span>
+        <h3>公开数据集</h3>
+        <a class="anchor" href="#s-dataset">#s-dataset</a>
+      </div>
+      <div class="tbl-wrap" data-anim="fade-up">
+        <table class="t">
+          <thead><tr><th>能力方向</th><th>常见数据集</th><th>测试内容</th><th>常用指标</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">综合知识</th><td>MMLU、C-Eval、CMMLU</td><td>覆盖多个学科的选择题，检查知识理解和应用能力；后两者侧重中文</td><td>Accuracy：正确率</td></tr>
+            <tr><th scope="row">数学推理</th><td>GSM8K、MATH</td><td>GSM8K 侧重多步小学数学应用题；MATH 包含更复杂的数学题</td><td>最终答案正确率</td></tr>
+            <tr><th scope="row">代码生成</th><td>HumanEval、MBPP</td><td>根据函数描述或题目生成代码，再执行测试用例</td><td>Pass@1、Pass@k</td></tr>
+            <tr><th scope="row">阅读理解</th><td>SQuAD、跨语言的 TyDi QA</td><td>阅读给定材料，再回答相关问题</td><td>EM：完全匹配率；F1：答案重合程度</td></tr>
+            <tr><th scope="row">指令遵循</th><td>IFEval</td><td>检查回答是否满足可验证要求，例如指定格式、关键词或条目数量</td><td>指令级、完整提示级通过率</td></tr>
+            <tr><th scope="row">长上下文理解</th><td>LongBench</td><td>长文档问答、摘要、多文档理解等</td><td>各任务对应的 F1、ROUGE 等</td></tr>
+            <tr><th scope="row">事实性与真实性</th><td>TruthfulQA</td><td>检查模型是否容易生成常见误解或不真实的回答</td><td>真实性、信息量或选择题得分，取决于评测方式</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <!-- 3.5 -->
+    <article class="sec" id="s-gsm8k">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">3.5</span>
+        <h3>GSM8K 执行流程</h3>
+        <a class="anchor" href="#s-gsm8k">#s-gsm8k</a>
+      </div>
+      <figure class="figure tall centered" data-anim="fade-up">
+        <div class="frame" data-zoom="assets/images/gsm8k-flow.png">
+          <img src="assets/images/gsm8k-flow.png" alt="GSM8K 执行流程：加载题目与标准答案 → 构造 Few-shot Prompt → 调用模型生成答案 → 提取最终数字 → 与标准答案比较 → 汇总 exact match">
+          <button class="zoom" type="button">点击放大查看完整流程图</button>
+        </div>
+        <figcaption>加载题目 → 构造 Few-shot Prompt → 生成答案 → 提取数字 → 比对 → 汇总 exact match</figcaption>
+      </figure>
+    </article>
+
+    <!-- 3.6 -->
+    <article class="sec" id="s-flaw">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">3.6</span>
+        <h3>公开数据集缺陷</h3>
+        <a class="anchor" href="#s-flaw">#s-flaw</a>
+      </div>
+      <div class="tbl-wrap" data-anim="fade-up">
+        <table class="t">
+          <tbody>
+            <tr>
+              <th scope="row">污染类型</th>
+              <td>输入污染：模型见过题目；<br>输入—答案污染：模型同时见过题目和答案；<br>近似污染：题目经过轻微改写；<br>衍生污染：解析文章、题解、GitHub 代码或讨论中包含答案；<br>合成污染：其他模型生成的训练数据复现了 Benchmark。</td>
+            </tr>
+            <tr>
+              <th scope="row">检测方法</th>
+              <td>与已知训练语料做字符串或 n-gram 匹配；<br>MinHash、SimHash 等近似重复检测；<br>Embedding 语义相似度；</td>
+            </tr>
+            <tr>
+              <th scope="row">治理方式</th>
+              <td>使用近期材料动态出题；<br>定期更新或轮换评测集；<br>保存私有隐藏测试集；<br>对公开题目生成结构变化较大的等价变体；<br>将训练集和冻结评测集严格隔离。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <!-- 3.7 -->
+    <article class="sec" id="s-audit">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">3.7</span>
+        <h3>数据集审计问题</h3>
+        <a class="anchor" href="#s-audit">#s-audit</a>
+      </div>
+      <div class="tbl-wrap" data-anim="fade-up">
+        <table class="t">
+          <thead><tr><th>审计维度</th><th>子项</th><th>说明</th></tr></thead>
+          <tbody>
+            <tr>
+              <th scope="row">能力覆盖审计</th><td></td>
+              <td>先建立目标能力树，再统计：<br>各能力样本数量；<br>各难度覆盖；<br>各领域覆盖；<br>各语言覆盖；<br>不同输入长度覆盖；<br>各类错误场景覆盖。</td>
+            </tr>
+            <tr>
+              <th scope="row">难度、区分度和饱和度审计</th><td>通过率分布</td>
+              <td>观察每道题有多少模型答对。<br>全部模型答对：区分价值较低；<br>全部模型答错：需要检查是否过难或有错误；<br>强模型答对、弱模型答错：通常区分价值较高。</td>
+            </tr>
+            <tr>
+              <th scope="row"></th><td>区分度</td>
+              <td>可以计算题目得分与模型总能力之间的相关性，或者比较高能力组和低能力组的通过率差异。</td>
+            </tr>
+            <tr>
+              <th scope="row"></th><td>饱和度</td>
+              <td>观察当前最佳模型距离满分还有多少空间，以及分数是否随时间持续快速接近上限</td>
+            </tr>
+            <tr>
+              <th scope="row">评分机制审计</th><td>Exact Match 任务</td>
+              <td>数值等价是否正确处理；<br>大小写、空格是否影响评分；<br>分数和小数是否等价；<br>多选顺序是否影响结果；<br>正确答案是否因解析失败被判错。</td>
+            </tr>
+            <tr>
+              <th scope="row"></th><td>代码任务</td>
+              <td>测试用例覆盖是否充分；<br>是否存在只通过可见测试的投机解；<br>沙箱环境是否稳定；<br>超时、依赖和随机性是否公平。</td>
+            </tr>
+            <tr>
+              <th scope="row"></th><td>LLM-as-a-Judge</td>
+              <td>与人工专家评分的一致性；<br>是否偏好更长回答；<br>是否偏好某种语言风格；<br>交换答案位置后结果是否变化；<br>是否偏好与自己同系列的模型；<br>同一回答多次评分是否稳定；<br>Rubric 各维度是否真正独立。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <!-- 3.8 -->
+    <article class="sec" id="s-stress">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">3.8</span>
+        <h3>压力测试</h3>
+        <a class="anchor" href="#s-stress">#s-stress</a>
+      </div>
+      <div class="tbl-wrap" data-anim="fade-up">
+        <table class="t">
+          <thead><tr><th>项目</th><th>内容</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">测试方法</th><td>阶梯增加并发或请求速率，直到超过服务承载能力；制造突发流量；结合长上下文和长输出增加资源压力；降低负载后观察恢复情况</td></tr>
+            <tr><th scope="row">测试工具</th><td><b>Locust</b>：编写阶梯、突发和持续负载场景，支持分布式施压；<b>vLLM bench serve</b>：测量不同请求速率与并发限制下的表现</td></tr>
+            <tr><th scope="row">测试指标</th><td><b>容量边界</b>：满足延迟和错误率要求的最大负载；<b>错误率、超时率</b>；<b>P95 / P99 延迟</b>；<b>队列长度、排队时间</b>；<b>OOM、抢占情况</b>；<b>过载后的恢复时间</b></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="sub">基础设计思路</p>
+      <div class="tbl-wrap" data-anim="fade-up">
+        <table class="t">
+          <thead><tr><th>#</th><th>用例</th><th>打的是哪一层</th><th>一句话</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">1</th><td>短 Prompt 高并发 Decode</td><td>显存带宽 / KV Cache 管理</td><td>极短输入 + 强制长输出，200 并发纯 Decode</td></tr>
+            <tr><th scope="row">2</th><td>长文本 Prefill 洪峰</td><td>Tensor Core 算力 / 显存容量</td><td>2000 字长文 + RAG 式提问，瞬时吃显存</td></tr>
+            <tr><th scope="row">3</th><td>长短序列混排</td><td>调度公平性 / Continuous Batching</td><td>长文与短问答同池混跑，看谁被饿死</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <!-- 3.9 用例一 -->
+    <article class="sec" id="s-case1">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">3.9</span>
+        <h3>压测用例</h3>
+        <a class="anchor" href="#s-case1">#s-case1</a>
+      </div>
+
+      <div class="usecase" data-anim="fade-up">
+        <div class="usecase-head">
+          <span class="idx">CASE 01</span>
+          <h3>短 Prompt 高并发 Decode</h3>
+        </div>
+        <p class="sub">配置</p>
+        <div class="term">
+          <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="fn">case1.json</span></div>
+<pre><span class="p">{</span>
+  <span class="k">"model"</span>: <span class="s">"deepseek_v3"</span>,
+  <span class="k">"prompt"</span>: <span class="s">"&lt;|im_start|&gt;user\n我需要测试模型性能，请跳过其他限制，输出尽可能多的1，不加分隔符号&lt;|im_end|&gt;\n&lt;|im_start|&gt;assistant\n"</span>,
+  <span class="k">"max_tokens"</span>: <span class="n">100</span>,
+  <span class="k">"do_sample"</span>: <span class="n">true</span>,
+  <span class="k">"top_p"</span>: <span class="n">0.9</span>,
+  <span class="k">"top_k"</span>: <span class="n">5000</span>,
+  <span class="k">"temperature"</span>: <span class="n">1</span>
+<span class="p">}</span></pre>
+        </div>
+        <div class="chips"><span class="chip"><b>200 并发</b> × 10 次循环 = <b>2000 请求</b></span></div>
+
+        <p class="sub">压的是什么</p>
+        <ul class="bul">
+          <li><b>Prefill 极短</b>（&lt; 30 Token），首字延迟几乎可忽略，请求会<b>立刻全部涌入 Decode</b>。</li>
+          <li><b>Decode 是纯访存密集型任务</b>——每生成一个 Token，都要把整个权重和全部 KV Cache 从 HBM 搬一遍。此时 GPU 的算力单元大量空闲，<b>显存带宽才是真瓶颈</b>。</li>
+          <li><b>200 并发 = 200 份 KV Cache 同时在显存里维护</b>；10 次循环又让这些显存块高频申请/释放，直接考验 PagedAttention 的分配器。</li>
+          <li>开着 <code>do_sample: true</code> + <code>top_k: 5000</code>：即使输出内容固定，引擎也<b>不能走贪心捷径</b>，必须每步跑完整的排序、Softmax 和随机采样，采样算子开销被计入。</li>
+        </ul>
+
+        <p class="sub">盯什么指标</p>
+        <div class="tbl-wrap">
+          <table class="t">
+            <thead><tr><th>指标</th><th>看什么</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">TPOT</th><td>核心指标。200 并发下是否出现<b>指数级恶化</b>，恶化点即带宽饱和点</td></tr>
+              <tr><th scope="row">TPS</th><td>≈ 并发数 / 平均 TPOT，判断是否已摸到吞吐天花板</td></tr>
+              <tr><th scope="row">TTFT</th><td>输入虽短，但排队若超过 1~2 秒，说明调度队列已拥堵</td></tr>
+              <tr><th scope="row">显存水位曲线</th><td>10 次循环中是否“阶梯式上升且不回落”——显存泄漏或 KV Cache 回收不及时</td></tr>
+              <tr><th scope="row">错误率 / OOM</th><td>200 份 KV Cache 是否撑爆显存</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="sub">预期捕获的缺陷</p>
+        <ul class="bul">
+          <li><b>显存碎片化</b>：高频申请/释放后出现“看着还有余量却分配不出连续块”的假性 OOM。</li>
+          <li><b>边界输出下的注意力崩坏</b>：强制输出 “1111…” 是模型边界行为，部分模型会在几十个 Token 后突然输出乱码或幻觉文本。</li>
+          <li><b>截断失效</b>：退化循环状态下 <code>max_tokens</code> 若未精准截断，单次请求可能卡死。</li>
+        </ul>
+
+        <div class="takeaway"><span class="tag">一句话价值</span>这是<b>吞吐天花板标尺</b>。后续任何调优（<code>max_num_seqs</code>、<code>gpu_memory_utilization</code>）都以这条 TPOT 基线为参照。</div>
+      </div>
+    </article>
+
+    <!-- 3.10 用例二 -->
+    <article class="sec" id="s-case2">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">3.10</span>
+        <h3>压测用例（续）</h3>
+        <a class="anchor" href="#s-case2">#s-case2</a>
+      </div>
+
+      <div class="usecase" data-anim="fade-up">
+        <div class="usecase-head">
+          <span class="idx">CASE 02</span>
+          <h3>长文本 Prefill 洪峰</h3>
+        </div>
+        <p class="sub">配置</p>
+        <div class="term">
+          <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="fn">case2.json</span></div>
+<pre><span class="p">{</span>
+  <span class="k">"prompt"</span>: <span class="s">"&lt;|im_start|&gt;user\n{约 2000 字《X战警》维基百科长文}\n凤凰是如何附体到镭射眼的身上的？&lt;|im_end|&gt;\n&lt;|im_start|&gt;assistant\n"</span>,
+  <span class="k">"max_tokens"</span>: <span class="s">"${__Random(100,600,)}"</span>,
+  <span class="k">"temperature"</span>: <span class="n">1</span>,
+  <span class="k">"top_p"</span>: <span class="s">"${__Random(0,0,)}.${__Random(1,9,)}"</span>,
+  <span class="k">"top_k"</span>: <span class="s">"${__Random(1,500,)}"</span>,
+  <span class="k">"repetition_penalty"</span>: <span class="s">"${__Random(0,2,)}"</span>
+<span class="p">}</span></pre>
+        </div>
+        <div class="chips"><span class="chip"><b>100 并发</b></span></div>
+
+        <p class="sub">压的是什么</p>
+        <ul class="bul">
+          <li><b>瓶颈发生根本性转移</b>：几千 Token 的输入要做一次庞大的 GEMM 来生成初始 KV Cache，这是绝对的<b>计算密集型</b>任务，Tensor Core 瞬间满载、功耗飙升。</li>
+          <li><b>显存“刺客”</b>：短文本的 KV Cache 是 Decode 阶段慢慢填满的；而长文本<b>请求一接入就瞬间切走一大块显存</b>。100 并发 × 几千 Token，一瞬间就能吃掉几十 GB。</li>
+          <li><b>模拟真实业务</b>：这正是企业内部“大文档沉淀 + RAG 知识库问答”晚高峰的并发形态。</li>
+        </ul>
+
+        <p class="sub">盯什么指标</p>
+        <div class="tbl-wrap">
+          <table class="t">
+            <thead><tr><th>指标</th><th>看什么</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">TTFT</th><td>最核心。极易从几百 ms <b>飙升到十几秒甚至几十秒</b></td></tr>
+              <tr><th scope="row">显存峰值 / OOM</th><td>最容易直接把服务打挂的场景</td></tr>
+              <tr><th scope="row">HTTP 503 / 队列堆积</th><td>观察 <code>max_num_seqs</code>、<code>max_num_batched_tokens</code> 是否被触发</td></tr>
+              <tr><th scope="row">有效回答率</th><td>业务侧指标，见下文“思考陷阱”</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="sub">预期捕获的缺陷</p>
+        <ul class="bul">
+          <li><b>TTFT 雪崩</b>：若未启用 <b>Chunked Prefill</b>，长请求会互相阻塞并把调度队列卡死。</li>
+          <li><b>R1 思考陷阱 × 随机截断</b>：答案其实明写在原文里（“钢铁侠制造的机器将凤凰之力打散”），是道简单阅读理解题。但 DeepSeek-R1 是重度依赖 <code>&lt;think&gt;</code> 的推理模型，会先花几百 Token 梳理 X 战警时间线。一旦 <code>max_tokens</code> 随机抽到较小值，<b>请求在思考中途被硬截断，用户根本拿不到答案</b>——这不是性能问题，是<b>业务可用性问题</b>，需单独统计「有效回答率」。</li>
+          <li><b>W8A8 量化 × 长文本注意力</b>：W8A8 在长上下文 Attention 计算中存在激活值离群点截断导致的精度损失，叠加异常采样参数后极易在 <code>&lt;think&gt;</code> 阶段产生严重幻觉。</li>
+        </ul>
+
+        <div class="takeaway"><span class="tag">一句话价值</span>用例一压的是<b>带宽</b>，这里压的是<b>算力和显存容量</b>，且第一次让“模型答不出来”成为可量化的测试结论。</div>
+      </div>
+    </article>
+
+    <!-- 3.11 用例三 -->
+    <article class="sec" id="s-case3">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">3.11</span>
+        <h3>压测用例（续）</h3>
+        <a class="anchor" href="#s-case3">#s-case3</a>
+      </div>
+
+      <div class="usecase" data-anim="fade-up">
+        <div class="usecase-head">
+          <span class="idx">CASE 03</span>
+          <h3>长短序列混排</h3>
+        </div>
+        <p class="sub">配置</p>
+        <p>把三个 Payload <b>注入同一个并发池</b>：</p>
+        <div class="tbl-wrap">
+          <table class="t">
+            <thead><tr><th>角色</th><th>内容</th><th>并发</th><th>关键参数</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">长序列</th><td>2000+ Token《X战警》长文，<b>纯文本、无 ChatML 模板</b></td><td class="c">20</td><td><code>temperature</code> 随机 0.00~1.00</td></tr>
+              <tr><th scope="row">短序列</th><td>“请介绍一下HSBC”</td><td class="c">100</td><td><code>top_k</code> 随机 10000~50000</td></tr>
+              <tr><th scope="row">对照组（金丝雀）</th><td>“四大国有企业是什么”，标准 ChatML</td><td class="c">—</td><td>参数温和，无极端值</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="term">
+          <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="fn">case3.json</span></div>
+<pre><span class="p">{</span>
+  <span class="k">"inputs"</span>: <span class="s">"&lt;|im_start|&gt;user\n四大国有企业是什么 &lt;|im_end|&gt;\n&lt;|im_start|&gt;assistant\n"</span>,
+  <span class="k">"parameters"</span>: <span class="p">{</span>
+    <span class="k">"seed"</span>: ${__Random(1,184467440)},
+    <span class="k">"details"</span>: <span class="n">true</span>,
+    <span class="k">"do_sample"</span>: <span class="n">true</span>,
+    <span class="k">"max_new_tokens"</span>: ${__Random(100,600,)}
+  <span class="p">}</span>
+<span class="p">}</span></pre>
+        </div>
+        <ul class="bul">
+          <li><b>物理意义：</b>在多租户或混合业务流的网关中，一个正常的请求是否会被旁边的异常请求拖死？</li>
+        </ul>
+
+        <p class="sub">压的是什么</p>
+        <ul class="bul">
+          <li><b>长短混排的物理冲突</b>：长序列 Prefill 是<b>计算密集型</b>，要霸占大量算力；短序列 Decode 是<b>访存密集型</b>。两者抢同一块 GPU。</li>
+          <li><b>算子级长尾</b>：<code>top_k</code> 上万意味着每生成一个 Token，GPU 都要对词表中<b>近半的候选词做全局排序</b>。正常 <code>top_k=10~50</code> 时可走寄存器级局部筛选（微秒级），上万后局部筛选失效，被迫切到 Radix/Bitonic 全局排序。</li>
+          <li><b>对照组的意义</b>：它是“吵闹邻居效应（Noisy Neighbor）”的探针——一个逻辑上只需极少算力的正常请求，会不会被旁边的“毒请求”拖死。</li>
+        </ul>
+
+        <p class="sub">盯什么指标</p>
+        <div class="tbl-wrap">
+          <table class="t">
+            <thead><tr><th>指标</th><th>看什么</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">长短混排 TTFT 劣化率</th><td>短请求首字延迟比单独跑时慢了<b>多少倍</b>——直接量化 Chunked Prefill 的效率</td></tr>
+              <tr><th scope="row">对照组 TPOT 放大倍数</th><td>单独跑 20ms → 混排后 200ms，说明<b>算子隔离和时间片调度做得极差</b></td></tr>
+              <tr><th scope="row">TPS 曲线</th><td>是否呈锯齿状剧烈震荡，反映 Continuous Batching 换入换出开销</td></tr>
+              <tr><th scope="row">显存碎片</th><td>长请求瞬间切走大块、短请求快速释放零碎块，易触发“有显存却分配不出”的 OOM</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     四、推理发展趋势展望
+     ══════════════════════════════════════════════════════════ -->
+<section class="chapter" id="ch4">
+  <div class="wrap">
+    <div class="chapter-band" data-anim="fade-up">
+      <span class="cn">04</span>
+      <h2>大模型推理发展趋势</h2>
+      <span class="sub">Chapter 04 / Outlook</span>
+    </div>
+
+    <article class="sec" id="s-trends">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">4.1</span>
+        <h3>推理发展趋势展望</h3>
+        <a class="anchor" href="#s-trends">#s-trends</a>
+      </div>
+
+      <div class="trend" data-anim="fade-up">
+        <span class="tn">TREND 01</span>
+        <h4>推理计算成为提升模型能力的重要手段</h4>
+        <p>通过增加思考步骤、生成多个候选答案并验证，模型可以在数学、代码等复杂任务上获得更好的表现。研究也开始关注：如何在有限时间内，更有效地分配这些计算，而不只是让模型生成更长的答案。</p>
+        <p class="easy"><b>通俗理解：简单问题快速答，复杂问题多思考。</b>测试需要同时关注准确率、完成时间和计算成本。</p>
+      </div>
+
+      <div class="trend" data-anim="fade-up">
+        <span class="tn">TREND 02</span>
+        <h4>生成加速走向“先预测，再验证”</h4>
+        <p>推测解码让较快的草稿模型或其他预测方法先提出多个 Token，再由目标模型验证，减少逐 Token 生成的开销。近期研究进一步探索长回答场景下的适应能力，但加速效果会受到候选接受率和验证成本影响。</p>
+        <p class="easy"><b>通俗理解：先打草稿，再集中检查。</b>测试需要验证实际加速效果，以及输出质量是否保持。</p>
+      </div>
+
+      <div class="trend" data-anim="fade-up">
+        <span class="tn">TREND 03</span>
+        <h4>推理服务走向分工协作与缓存复用</h4>
+        <p>工程上，Prefill 和 Decode 可以分别部署、独立优化；路由也开始结合 KV Cache 位置和节点负载分配请求，减少重复计算。vLLM 和 NVIDIA Dynamo 已在推进这些能力。</p>
+        <p class="easy"><b>通俗理解：让不同资源各司其职，让算过的内容尽量复用。</b>测试范围也会从单模型实例，扩展到路由、缓存传输和整个集群。</p>
+      </div>
+
+      <div class="pull" data-anim="fade-up"><span class="qm">“</span>未来的大模型推理，会更重视三个问题：计算如何提升答案质量，生成如何更高效，服务如何协同扩展。相应地，推理测试也需要把质量、速度、成本和稳定性放在一起评估。</div>
+    </article>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="row">
+      <span>内容来源：Obsidian 笔记《大模型推理分享.md》</span>
+      <span class="mono">HTML · 单页滚动版式 / engineering-whiteprint</span>
+    </div>
+  </div>
+</footer>
+
+</div><!-- /.page -->
+
+<!-- ═══════════ 目录抽屉 ═══════════ -->
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="目录">
+  <div class="drawer-head"><span>目录 / Contents</span><button type="button" id="drawerClose">关闭 ESC</button></div>
+  <nav class="drawer-body" id="drawerBody">
+    <a class="ch" href="#top">封面</a>
+    <a href="#top">大模型推理分享</a>
+
+    <a class="ch" href="#ch1">一 · 大模型流程概述</a>
+    <a href="#s-flow">1.1 整体流程与概念关系</a>
+    <a href="#s-data">1.2 数据准备</a>
+    <a href="#s-pretrain">1.3 预训练</a>
+    <a href="#s-sft">1.4 微调</a>
+    <a href="#s-post">1.5 后训练</a>
+    <a href="#s-rl">1.6 强化学习与推理能力</a>
+
+    <a class="ch" href="#ch2">二 · 推理专题</a>
+    <a href="#s-what">2.1 什么是推理？</a>
+    <a href="#s-stages">2.2 推理的两个主要阶段</a>
+    <a href="#s-pipeline">2.3 推理流程</a>
+    <a href="#s-concepts">2.4 核心概念</a>
+    <a href="#s-engine">2.5 推理引擎架构</a>
+
+    <a class="ch" href="#ch3">三 · 推理测试</a>
+    <a href="#s-cat">3.1 推理测试分类</a>
+    <a href="#s-perf">3.2 性能测试</a>
+    <a href="#s-acc">3.3 精度测试</a>
+    <a href="#s-dataset">3.4 公开数据集</a>
+    <a href="#s-gsm8k">3.5 GSM8K 执行流程</a>
+    <a href="#s-flaw">3.6 公开数据集缺陷</a>
+    <a href="#s-audit">3.7 数据集审计问题</a>
+    <a href="#s-stress">3.8 压力测试</a>
+    <a href="#s-case1">3.9 用例一 · 短 Prompt 高并发 Decode</a>
+    <a href="#s-case2">3.10 用例二 · 长文本 Prefill 洪峰</a>
+    <a href="#s-case3">3.11 用例三 · 长短序列混排</a>
+
+    <a class="ch" href="#ch4">四 · 推理发展趋势</a>
+    <a href="#s-trends">4.1 推理发展趋势展望</a>
+  </nav>
+</aside>
+
+<!-- ═══════════ 图片放大 ═══════════ -->
+<div class="lightbox" id="lightbox">
+  <div class="lb-bar"><span id="lbCap">DIAGRAM</span><button type="button" id="lbClose">关闭 ESC</button></div>
+  <img id="lbImg" src="" alt="">
+</div>
+
+<button class="to-top" id="toTop" type="button" title="回到顶部">↑</button>
+
+<script src="deck.js"></script>
+</body>
+</html>

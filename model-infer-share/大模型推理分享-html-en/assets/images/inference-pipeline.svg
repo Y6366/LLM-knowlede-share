@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2700" height="330" viewBox="0 0 2700 330" role="img" aria-labelledby="title desc">
+  <title id="title">LLM inference pipeline</title>
+  <desc id="desc">Five steps left to right: User submits a question, Convert to Tokens, Prefill: process input, Decode: generate step by step, Return the response.</desc>
+
+  <!-- white background -->
+  <rect x="0" y="0" width="2700" height="330" fill="#FFFFFF"/>
+
+  <!-- connector arrows: thin grey line ending in a small filled triangular head -->
+  <g fill="#8F8F8F" stroke="#8F8F8F" stroke-width="2.5" stroke-linecap="butt">
+    <path d="M466.5 162.2 H539 M539 152.7 L549 162.2 L539 171.7 Z"/>
+    <path d="M986.5 162.2 H1059 M1059 152.7 L1069 162.2 L1059 171.7 Z"/>
+    <path d="M1567.5 162.2 H1640 M1640 152.7 L1650 162.2 L1640 171.7 Z"/>
+    <path d="M2178.5 162.2 H2252 M2252 152.7 L2262 162.2 L2252 171.7 Z"/>
+  </g>
+
+  <!-- rounded step boxes -->
+  <g fill="#E5F3FF" stroke="#CBD9E6" stroke-width="2">
+    <rect x="59.5" y="84.75" width="406" height="155.75" rx="41" ry="41"/>
+    <rect x="569.5" y="84.75" width="416" height="155.75" rx="41" ry="41"/>
+    <rect x="1089.5" y="84.75" width="477" height="155.75" rx="41" ry="41"/>
+    <rect x="1669" y="84.75" width="509" height="155.75" rx="41" ry="41"/>
+    <rect x="2282.5" y="84.75" width="333" height="155.75" rx="41" ry="41"/>
+  </g>
+
+  <!-- step labels: bold dark navy, centred in each box -->
+  <g font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="36" font-weight="bold" fill="#004F99" text-anchor="middle">
+    <text x="262.5" y="154">User submits a</text>
+    <text x="262.5" y="198">question</text>
+
+    <text x="777.5" y="176">Convert to Tokens</text>
+
+    <text x="1328" y="176">Prefill: process input</text>
+
+    <text x="1924" y="154">Decode: generate</text>
+    <text x="1924" y="198">step by step</text>
+
+    <text x="2449" y="154">Return the</text>
+    <text x="2449" y="198">response</text>
+  </g>
+</svg>

@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="1233" viewBox="0 0 780 1233" role="img" aria-label="GSM8K exact-match evaluation flow">
+  <title>GSM8K exact-match evaluation flow</title>
+
+  <!-- white background -->
+  <rect x="0" y="0" width="780" height="1233" fill="#FFFFFF"/>
+
+  <!-- ===== boxes ===== -->
+  <g fill="#E5F3FF" stroke="#C6D8E8" stroke-width="1.5">
+    <rect x="162"   y="41"   width="443" height="115" rx="20" ry="20"/>
+    <rect x="219"   y="221"  width="329" height="93"  rx="20" ry="20"/>
+    <rect x="196"   y="379"  width="375" height="115" rx="20" ry="20"/>
+    <rect x="231"   y="559"  width="305" height="93"  rx="20" ry="20"/>
+    <rect x="184.5" y="717"  width="398" height="93"  rx="20" ry="20"/>
+    <rect x="173.5" y="875"  width="420" height="137" rx="20" ry="20"/>
+    <rect x="167"   y="1077" width="433" height="115" rx="20" ry="20"/>
+  </g>
+
+  <!-- ===== arrows ===== -->
+  <g stroke="#9A9A9A" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M383.5 157 V209"/>
+    <path d="M378.5 201.5 L383.5 209 L388.5 201.5"/>
+
+    <path d="M383.5 315 V367"/>
+    <path d="M378.5 359.5 L383.5 367 L388.5 359.5"/>
+
+    <path d="M383.5 495 V547"/>
+    <path d="M378.5 539.5 L383.5 547 L388.5 539.5"/>
+
+    <path d="M383.5 653 V705"/>
+    <path d="M378.5 697.5 L383.5 705 L388.5 697.5"/>
+
+    <path d="M383.5 811 V863"/>
+    <path d="M378.5 855.5 L383.5 863 L388.5 855.5"/>
+
+    <path d="M383.5 1013 V1065"/>
+    <path d="M378.5 1057.5 L383.5 1065 L388.5 1057.5"/>
+  </g>
+
+  <!-- ===== labels ===== -->
+  <g font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="18" font-weight="bold"
+     fill="#004F99" text-anchor="middle">
+
+    <!-- 1. the dataset -->
+    <text x="383.5" y="81">
+      <tspan x="383.5" dy="0">GSM8K test set: 1,319 problems</tspan>
+      <tspan x="383.5" dy="22">question: the problem</tspan>
+      <tspan x="383.5" dy="22">answer: reasoning steps + final answer</tspan>
+    </text>
+
+    <!-- 2. load data -->
+    <text x="383.5" y="261">
+      <tspan x="383.5" dy="0">Load problems and</tspan>
+      <tspan x="383.5" dy="22">reference answers</tspan>
+    </text>
+
+    <!-- 3. build prompt -->
+    <text x="383.5" y="419">
+      <tspan x="383.5" dy="0">Build the few-shot prompt</tspan>
+      <tspan x="383.5" dy="22">worked examples +</tspan>
+      <tspan x="383.5" dy="22">current problem</tspan>
+    </text>
+
+    <!-- 4. generate -->
+    <text x="383.5" y="599">
+      <tspan x="383.5" dy="0">Call the model to</tspan>
+      <tspan x="383.5" dy="22">generate an answer</tspan>
+    </text>
+
+    <!-- 5. extract -->
+    <text x="383.5" y="757">
+      <tspan x="383.5" dy="0">Extract the final number</tspan>
+      <tspan x="383.5" dy="22">from the model output</tspan>
+    </text>
+
+    <!-- 6. compare -->
+    <text x="383.5" y="915">
+      <tspan x="383.5" dy="0">Compare with the final number</tspan>
+      <tspan x="383.5" dy="22">in the reference answer</tspan>
+      <tspan x="383.5" dy="22">normalize number formats,</tspan>
+      <tspan x="383.5" dy="22">then check equality</tspan>
+    </text>
+
+    <!-- 7. aggregate -->
+    <text x="383.5" y="1117">
+      <tspan x="383.5" dy="0">Aggregate exact match</tspan>
+      <tspan x="383.5" dy="22">over all problems</tspan>
+      <tspan x="383.5" dy="22">correct &#247; total</tspan>
+    </text>
+  </g>
+</svg>

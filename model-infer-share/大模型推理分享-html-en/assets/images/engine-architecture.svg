@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1566" height="2856" viewBox="0 0 1566 2856">
+<defs>
+<marker id="ah" viewBox="0 0 12 12" refX="10.2" refY="6" markerWidth="12" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto"><path d="M1.4,1.6 L10.2,6 L1.4,10.4" fill="none" stroke="#8F8F8F" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></marker>
+</defs>
+<rect x="0" y="0" width="1566" height="2856" fill="#FFFFFF"/>
+<rect x="604" y="892" width="558" height="632" fill="#F3F3F3" stroke="#D8D8D8" stroke-width="2"/>
+<rect x="209" y="1967" width="977" height="436" fill="#F3F3F3" stroke="#D8D8D8" stroke-width="2"/>
+<path d="M495.5,520 L495.5,594" fill="none" stroke="#8F8F8F" stroke-width="2" marker-end="url(#ah)"/>
+<path d="M495.5,760 L495.5,791 Q495.5,799 503.5,799 L830,799 Q838,799 838,807 L838,955" fill="none" stroke="#8F8F8F" stroke-width="2" marker-end="url(#ah)"/>
+<path d="M1251,139 L1251,207 Q1251,215 1243,215 L180,215 Q172,215 172,223 L172,830 Q172,838 180,838 L724,838 Q732,838 732,846 L732,955" fill="none" stroke="#8F8F8F" stroke-width="2" marker-end="url(#ah)"/>
+<path d="M393,2500 L393,2468 Q393,2460 385,2460 L23,2460 Q15,2460 15,2452 L15,183 Q15,175 23,175 L1149,175 Q1157,175 1157,167 L1157,139" fill="none" stroke="#8F8F8F" stroke-width="2" marker-end="url(#ah)"/>
+<path d="M1336,139 L1336,384" fill="none" stroke="#8F8F8F" stroke-width="2" marker-end="url(#ah)"/>
+<path d="M838,1090 L838,1148" fill="none" stroke="#8F8F8F" stroke-width="2" marker-end="url(#ah)"/>
+<path d="M914,1308 L914,1369" fill="none" stroke="#8F8F8F" stroke-width="2" marker-end="url(#ah)"/>
+<path d="M914,1498 L914,1616" fill="none" stroke="#8F8F8F" stroke-width="2" marker-end="url(#ah)"/>
+<path d="M860,1738 L860,1774 Q860,1782 852,1782 L745,1782 Q737,1782 737,1790 L737,1901 Q737,1909 729,1909 L479,1909 Q471,1909 471,1917 L471,2030" fill="none" stroke="#8F8F8F" stroke-width="2" marker-end="url(#ah)"/>
+<path d="M966,1738 L966,2030" fill="none" stroke="#8F8F8F" stroke-width="2" marker-end="url(#ah)"/>
+<path d="M471,2190 L471,2250" fill="none" stroke="#8F8F8F" stroke-width="2" marker-end="url(#ah)"/>
+<path d="M966,2190 L966,2212 Q966,2220 958,2220 L605,2220 Q597,2220 597,2228 L597,2250" fill="none" stroke="#8F8F8F" stroke-width="2" marker-end="url(#ah)"/>
+<path d="M533,2380 L533,2499" fill="none" stroke="#8F8F8F" stroke-width="2" marker-end="url(#ah)"/>
+<path d="M463,2629 L463,2709" fill="none" stroke="#8F8F8F" stroke-width="2" marker-end="url(#ah)"/>
+<path d="M945,760 L945,955" fill="none" stroke="#8F8F8F" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#ah)"/>
+<path d="M1336,520 L1336,790 Q1336,798 1328,798 L1089,798 Q1081,798 1081,806 L1081,1110 Q1081,1118 1073,1118 L1000,1118 Q992,1118 992,1126 L992,1148" fill="none" stroke="#8F8F8F" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#ah)"/>
+<text x="883" y="922" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="24" text-anchor="middle"><tspan fill="#141414">Engine Core:</tspan><tspan fill="#6E6E6E"> scheduling and cache management</tspan></text>
+<text x="697" y="1996" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="24" text-anchor="middle"><tspan fill="#141414">GPU Worker:</tspan><tspan fill="#6E6E6E"> model computation</tspan></text>
+<rect x="1079" y="13" width="345" height="125" rx="26" fill="#F5FAFF" stroke="#C3D7E8" stroke-width="2" stroke-dasharray="5 4"/>
+<rect x="1123" y="386" width="428" height="133" rx="22" fill="#E5F3FF" stroke="#C3D7E8" stroke-width="2"/>
+<rect x="366" y="396" width="259" height="123" rx="22" fill="#E5F3FF" stroke="#C3D7E8" stroke-width="2"/>
+<rect x="37" y="425" width="270" height="55" rx="27" fill="#E5F3FF" stroke="#C3D7E8" stroke-width="2"/>
+<rect x="296" y="596" width="399" height="163" rx="24" fill="#E5F3FF" stroke="#C3D7E8" stroke-width="2"/>
+<rect x="773" y="637" width="344" height="122" rx="22" fill="#E5F3FF" stroke="#C3D7E8" stroke-width="2"/>
+<rect x="1136" y="651" width="400" height="54" rx="27" fill="#E5F3FF" stroke="#C3D7E8" stroke-width="2"/>
+<rect x="625" y="957" width="427" height="132" rx="24" fill="#E5F3FF" stroke="#C3D7E8" stroke-width="2"/>
+<rect x="690" y="1150" width="448" height="157" rx="24" fill="#E5F3FF" stroke="#C3D7E8" stroke-width="2"/>
+<rect x="698" y="1371" width="432" height="126" rx="24" fill="#E5F3FF" stroke="#C3D7E8" stroke-width="2"/>
+<rect x="758" y="1618" width="312" height="119" rx="26" fill="#F5FAFF" stroke="#C3D7E8" stroke-width="2" stroke-dasharray="5 4"/>
+<rect x="606" y="1820" width="246" height="48" rx="24" fill="#E5F3FF" stroke="#C3D7E8" stroke-width="2"/>
+<rect x="866" y="1820" width="200" height="48" rx="24" fill="#E5F3FF" stroke="#C3D7E8" stroke-width="2"/>
+<rect x="236" y="2032" width="470" height="157" rx="24" fill="#E5F3FF" stroke="#C3D7E8" stroke-width="2"/>
+<rect x="770" y="2032" width="392" height="157" rx="24" fill="#E5F3FF" stroke="#C3D7E8" stroke-width="2"/>
+<rect x="347" y="2252" width="373" height="127" rx="24" fill="#E5F3FF" stroke="#C3D7E8" stroke-width="2"/>
+<rect x="253" y="2501" width="421" height="127" rx="24" fill="#E5F3FF" stroke="#C3D7E8" stroke-width="2"/>
+<rect x="281" y="2711" width="365" height="127" rx="24" fill="#E5F3FF" stroke="#C3D7E8" stroke-width="2"/>
+<rect x="1300" y="255" width="72" height="50" rx="25" fill="#E5F3FF" stroke="#C3D7E8" stroke-width="2"/>
+<text x="1251.5" y="83.2" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="22" font-weight="bold" fill="#004F99" text-anchor="middle">Request complete?</text>
+<text x="1337.0" y="447.0" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="21" font-weight="bold" fill="#004F99" text-anchor="middle">End request</text>
+<text x="1337.0" y="472.7" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="21" font-weight="bold" fill="#004F99" text-anchor="middle">release its KV Block references</text>
+<text x="495.5" y="465.2" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="22" font-weight="bold" fill="#004F99" text-anchor="middle">User request</text>
+<text x="172.0" y="458.4" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="17" font-weight="bold" fill="#004F99" text-anchor="middle">No: proceed to next iteration</text>
+<text x="495.5" y="661.0" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="19" font-weight="bold" fill="#004F99" text-anchor="middle">API Server</text>
+<text x="495.5" y="684.1" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="19" font-weight="bold" fill="#004F99" text-anchor="middle">protocol parsing and request validation</text>
+<text x="495.5" y="707.3" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="19" font-weight="bold" fill="#004F99" text-anchor="middle">Tokenization</text>
+<text x="945.0" y="705.4" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="21" font-weight="bold" fill="#004F99" text-anchor="middle">New requests keep arriving</text>
+<text x="1336.0" y="684.0" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="17" font-weight="bold" fill="#004F99" text-anchor="middle">Freed capacity available for later scheduling</text>
+<text x="838.5" y="1017.8" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="20" font-weight="bold" fill="#004F99" text-anchor="middle">Request queue</text>
+<text x="838.5" y="1042.2" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="20" font-weight="bold" fill="#004F99" text-anchor="middle">requests waiting or resuming execution</text>
+<text x="914.0" y="1210.2" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="21" font-weight="bold" fill="#004F99" text-anchor="middle">Scheduler: continuous batching</text>
+<text x="914.0" y="1235.8" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="21" font-weight="bold" fill="#004F99" text-anchor="middle">based on Token budget, KV capacity,</text>
+<text x="914.0" y="1261.5" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="21" font-weight="bold" fill="#004F99" text-anchor="middle">and request state</text>
+<text x="914.0" y="1428.5" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="21" font-weight="bold" fill="#004F99" text-anchor="middle">KV Cache Manager</text>
+<text x="914.0" y="1454.2" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="21" font-weight="bold" fill="#004F99" text-anchor="middle">paged Block allocation and reuse</text>
+<text x="914.0" y="1672.0" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="21" font-weight="bold" fill="#004F99" text-anchor="middle">Current iteration's</text>
+<text x="914.0" y="1697.7" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="21" font-weight="bold" fill="#004F99" text-anchor="middle">compute stage</text>
+<text x="729.0" y="1850.0" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="17" font-weight="bold" fill="#004F99" text-anchor="middle">Input not fully processed</text>
+<text x="966.0" y="1850.0" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="17" font-weight="bold" fill="#004F99" text-anchor="middle">Continue generating</text>
+<text x="471.0" y="2092.2" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="21" font-weight="bold" fill="#004F99" text-anchor="middle">Prefill</text>
+<text x="471.0" y="2117.8" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="21" font-weight="bold" fill="#004F99" text-anchor="middle">process the input context,</text>
+<text x="471.0" y="2143.5" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="21" font-weight="bold" fill="#004F99" text-anchor="middle">build the KV Cache</text>
+<text x="966.0" y="2092.2" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="21" font-weight="bold" fill="#004F99" text-anchor="middle">Decode</text>
+<text x="966.0" y="2117.8" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="21" font-weight="bold" fill="#004F99" text-anchor="middle">reuse historical KV Cache</text>
+<text x="966.0" y="2143.5" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="21" font-weight="bold" fill="#004F99" text-anchor="middle">compute the new Token</text>
+<text x="533.5" y="2310.0" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="21" font-weight="bold" fill="#004F99" text-anchor="middle">Sampling</text>
+<text x="533.5" y="2335.7" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="21" font-weight="bold" fill="#004F99" text-anchor="middle">select the next Token</text>
+<text x="463.5" y="2559.6" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="19" font-weight="bold" fill="#004F99" text-anchor="middle">Output processing</text>
+<text x="463.5" y="2582.7" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="19" font-weight="bold" fill="#004F99" text-anchor="middle">detokenization and stop-condition checks</text>
+<text x="463.5" y="2769.8" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="18" font-weight="bold" fill="#004F99" text-anchor="middle">API Server</text>
+<text x="463.5" y="2791.8" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="18" font-weight="bold" fill="#004F99" text-anchor="middle">stream back newly generated content</text>
+<text x="1336.0" y="286.6" font-family="Helvetica Neue,Helvetica,Arial,sans-serif" font-size="19" font-weight="bold" fill="#004F99" text-anchor="middle">Yes</text>
+</svg>

@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2625" height="771" viewBox="0 0 2625 771" font-family="Helvetica Neue,Helvetica,Arial,sans-serif">
+  <!-- canvas background -->
+  <rect x="0" y="0" width="2625" height="771" fill="#FFFFFF"/>
+
+  <!-- ============ band containers (pale yellow) ============ -->
+  <rect x="540.5" y="32" width="1510" height="386" fill="#FFFFDE" stroke="#AAAA33" stroke-width="2"/>
+  <rect x="1044" y="117.5" width="965" height="271" fill="#FFFFDE" stroke="#AAAA33" stroke-width="1.5"/>
+
+  <!-- ============ flow arrows ============ -->
+  <g stroke="#333333" stroke-width="3" fill="#333333" stroke-linecap="butt">
+    <!-- horizontal: Data Preparation -> Pre-training -->
+    <line x1="500.5" y1="291" x2="524.5" y2="291"/>
+    <polygon stroke="none" points="524,278 551.5,291 524,304"/>
+    <!-- horizontal: Pre-training -> Fine-tuning -->
+    <line x1="1020" y1="291" x2="1044" y2="291"/>
+    <polygon stroke="none" points="1043.5,278 1071,291 1043.5,304"/>
+    <!-- horizontal: Fine-tuning -> Preference Optimization / RL -->
+    <line x1="1540" y1="291" x2="1564" y2="291"/>
+    <polygon stroke="none" points="1563.5,278 1591,291 1563.5,304"/>
+    <!-- horizontal: Preference Optimization / RL -> Inference -->
+    <line x1="2059.5" y1="291" x2="2083.5" y2="291"/>
+    <polygon stroke="none" points="2083,278 2110.5,291 2083,304"/>
+    <!-- vertical arrows down to the detail boxes -->
+    <line x1="268.5" y1="358" x2="268.5" y2="480"/>
+    <polygon stroke="none" points="255.5,480 281.5,480 268.5,507"/>
+    <line x1="788" y1="358" x2="788" y2="480"/>
+    <polygon stroke="none" points="775,480 801,480 788,507"/>
+    <line x1="1308" y1="358" x2="1308" y2="480"/>
+    <polygon stroke="none" points="1295,480 1321,480 1308,507"/>
+    <line x1="1827.5" y1="358" x2="1827.5" y2="480"/>
+    <polygon stroke="none" points="1814.5,480 1840.5,480 1827.5,507"/>
+    <line x1="2347.5" y1="358" x2="2347.5" y2="480"/>
+    <polygon stroke="none" points="2334.5,480 2360.5,480 2347.5,507"/>
+  </g>
+
+  <!-- ============ band titles ============ -->
+  <text x="1295.5" y="82" text-anchor="middle" font-size="38" fill="#222222">Training: update model parameters</text>
+  <text x="1526.5" y="166" text-anchor="middle" font-size="30" fill="#222222">Post-training: optimize capabilities and response behavior</text>
+
+  <!-- ============ five step boxes (pale lavender) ============ -->
+  <g fill="#ECECFF" stroke="#9370DB" stroke-width="2">
+    <rect x="37.5" y="225" width="462" height="132" rx="3"/>
+    <rect x="557" y="225" width="462" height="132" rx="3"/>
+    <rect x="1077" y="225" width="462" height="132" rx="3"/>
+    <rect x="1596.5" y="225" width="462" height="132" rx="3"/>
+    <rect x="2116.5" y="225" width="462" height="132" rx="3"/>
+  </g>
+
+  <g fill="#222222" text-anchor="middle">
+    <text x="268.5" y="299" font-size="32">Data Preparation</text>
+
+    <text x="788" y="273" font-size="28"><tspan x="788" dy="0">Pre-training: learn general</tspan><tspan x="788" dy="48">knowledge and language patterns</tspan></text>
+
+    <text x="1308" y="273" font-size="28"><tspan x="1308" dy="0">Fine-tuning: adapt to instructions,</tspan><tspan x="1308" dy="48">domains and tasks</tspan></text>
+
+    <text x="1827.5" y="273" font-size="28"><tspan x="1827.5" dy="0">Preference Optimization / RL:</tspan><tspan x="1827.5" dy="48">improve response quality</tspan></text>
+
+    <text x="2347.5" y="273" font-size="28"><tspan x="2347.5" dy="0">Inference: take input and</tspan><tspan x="2347.5" dy="48">generate responses</tspan></text>
+  </g>
+
+  <!-- ============ five detail boxes (white) ============ -->
+  <g fill="#FFFFFF" stroke="#BBBBBB" stroke-width="1.5">
+    <rect x="37.5" y="510.5" width="462" height="178.5" rx="3"/>
+    <rect x="557" y="510.5" width="462" height="178.5" rx="3"/>
+    <rect x="1077" y="510.5" width="462" height="178.5" rx="3"/>
+    <rect x="1596.5" y="510.5" width="462" height="178.5" rx="3"/>
+    <rect x="2116.5" y="510.5" width="462" height="178.5" rx="3"/>
+  </g>
+
+  <g fill="#222222" text-anchor="middle" font-size="18">
+    <text x="268.5" y="578"><tspan x="268.5" dy="0">Function: cleaning, deduplication, tokenization</tspan><tspan x="268.5" dy="56">Output: training set, validation set, test set</tspan></text>
+
+    <text x="788" y="578"><tspan x="788" dy="0">Function: learn general language and knowledge</tspan><tspan x="788" dy="56">Output: base model</tspan></text>
+
+    <text x="1308" y="578"><tspan x="1308" dy="0">Function: learn instruction following and domain tasks</tspan><tspan x="1308" dy="56">Output: fine-tuned model or LoRA weights</tspan></text>
+
+    <text x="1827.5" y="578"><tspan x="1827.5" dy="0">Function: optimize responses via preference or reward</tspan><tspan x="1827.5" dy="56">Output: optimized model weights</tspan></text>
+
+    <text x="2347.5" y="578"><tspan x="2347.5" dy="0">Function: handle requests with existing parameters</tspan><tspan x="2347.5" dy="56">Output: text, code, or structured results</tspan></text>
+  </g>
+</svg>

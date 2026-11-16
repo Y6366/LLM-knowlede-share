@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LLM Inference · From Training Pipeline to Inference Testing</title>
+<script>document.documentElement.className='js'</script>
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/base.css">
+<link rel="stylesheet" href="assets/themes/engineering-whiteprint.css">
+<link rel="stylesheet" href="assets/animations.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="progress-track"><span id="progressBar"></span></div>
+
+<!-- ═══════════ Top bar ═══════════ -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="#top">LLM Inference</a>
+    <nav class="chapnav" id="chapNav">
+      <a href="#ch1"><span class="n">1</span>Pipeline Overview</a>
+      <a href="#ch2"><span class="n">2</span>Inference</a>
+      <a href="#ch3"><span class="n">3</span>Inference Testing</a>
+      <a href="#ch4"><span class="n">4</span>Outlook</a>
+    </nav>
+    <button class="toc-btn" id="tocBtn" type="button"><span class="bars"></span>Contents</button>
+  </div>
+</header>
+
+<div class="page">
+
+<!-- ═══════════ Cover ═══════════ -->
+<section class="hero" id="top">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <p class="kicker" data-anim="fade-up">TECH TALK · LLM INFERENCE</p>
+        <h1 data-anim="fade-up">LLM Inference<br><em>From Pipeline to Testing</em></h1>
+        <p class="lede" data-anim="fade-up">Starting from data preparation and the training pipeline, we move into the two stages of inference and the internals of an inference engine, then land on the three categories of testing — performance, accuracy, and stress — plus three load-test cases, and close with where inference is heading.</p>
+        <div class="hero-meta" data-anim="fade-up">
+          <span class="pill">Pipeline Overview</span>
+          <span class="pill">Inference</span>
+          <span class="pill">Testing</span>
+          <span class="pill">Outlook</span>
+        </div>
+      </div>
+      <div data-anim="fade-right">
+        <nav class="agenda">
+          <div class="agenda-cap">Core Content</div>
+          <a href="#ch1"><span class="no">1</span><span class="ti">LLM Pipeline Overview</span><span class="de">Data Preparation · Pre-training · Fine-tuning · Post-training · Reinforcement Learning</span></a>
+          <a href="#ch2"><span class="no">2</span><span class="ti">Inference in Depth</span><span class="de">What Is Inference · Two Main Stages · Inference Pipeline · Core Concepts</span></a>
+          <a href="#ch3"><span class="no">3</span><span class="ti">Inference Testing</span><span class="de">Performance · Accuracy · Stress Testing · Three Load-Test Cases</span></a>
+          <a href="#ch4"><span class="no">4</span><span class="ti">Inference Trends</span><span class="de">Reasoning Compute · Generation Acceleration · Disaggregation</span></a>
+        </nav>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     1. LLM Pipeline Overview
+     ══════════════════════════════════════════════════════════ -->
+<section class="chapter" id="ch1">
+  <div class="wrap">
+    <div class="chapter-band" data-anim="fade-up">
+      <span class="cn">01</span>
+      <h2>LLM Pipeline Overview</h2>
+      <span class="sub">Chapter 01 / Pipeline</span>
+    </div>
+
+    <!-- 1.1 -->
+    <article class="sec" id="s-flow">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">1.1</span>
+        <h3>Overall Pipeline and Concept Relationships</h3>
+        <a class="anchor" href="#s-flow">#s-flow</a>
+      </div>
+      <figure class="figure wide" data-anim="fade-up">
+        <div class="frame"><img src="assets/images/flow-overview.svg" alt="End-to-end LLM pipeline: data preparation → pre-training → fine-tuning → preference optimization / reinforcement learning → inference"></div>
+        <figcaption>Data Preparation → Pre-training → Fine-tuning → Preference Optimization / RL → Inference</figcaption>
+      </figure>
+    </article>
+
+    <!-- 1.2 -->
+    <article class="sec" id="s-data">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">1.2</span>
+        <h3>Data Preparation: The Raw Material for Model Learning</h3>
+        <a class="anchor" href="#s-data">#s-data</a>
+      </div>
+      <p data-anim="fade-up">Before formal training begins, data has to be collected and processed.</p>
+      <p data-anim="fade-up">Common sources include web pages, books, papers, code, and Q&amp;A content; multimodal models may also use images, audio, and video.</p>
+      <p data-anim="fade-up">Data preparation typically involves:</p>
+      <div class="cards c5" data-anim="fade-up">
+        <div class="c"><span class="no">01</span><h4>Cleaning</h4><p>Remove garbled text, meaningless content, and low-quality samples.</p></div>
+        <div class="c"><span class="no">02</span><h4>Deduplication</h4><p>Reduce duplicate data so the model does not over-learn certain content.</p></div>
+        <div class="c"><span class="no">03</span><h4>Filtering</h4><p>Handle sensitive information, disallowed content, and the like.</p></div>
+        <div class="c"><span class="no">04</span><h4>Tokenization</h4><p>Convert raw text into Tokens.</p></div>
+        <div class="c"><span class="no">05</span><h4>Dataset Splitting</h4><p>Separate training, validation, and test sets to reduce benchmark data leakage.</p></div>
+      </div>
+      <p data-anim="fade-up">In one sentence:</p>
+      <div class="pull" data-anim="fade-up"><span class="qm">“</span>Model capability depends not only on parameter count, but also on the quality, coverage, and organization of the training data.</div>
+    </article>
+
+    <!-- 1.3 -->
+    <article class="sec" id="s-pretrain">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">1.3</span>
+        <h3>Pre-training: Building General Capability</h3>
+        <a class="anchor" href="#s-pretrain">#s-pretrain</a>
+      </div>
+      <p data-anim="fade-up">Pre-training typically starts from an initialized model and uses large-scale data to learn language patterns and knowledge associations.</p>
+      <p data-anim="fade-up">For a typical autoregressive language model, the core task is:</p>
+      <div class="key" data-anim="fade-up"><span class="lbl">Core Task</span>Given the preceding Tokens, predict the next Token.</div>
+
+      <p class="sub">What Does Pre-training Produce?</p>
+      <p data-anim="fade-up">Pre-training typically produces a <b>base model</b>.</p>
+      <p data-anim="fade-up">It may already generate text well, but it cannot necessarily yet reliably:</p>
+      <ul class="bul" data-anim="fade-up">
+        <li>Understand and follow user instructions.</li>
+        <li>Answer in a specified format.</li>
+        <li>Hold a natural multi-turn conversation.</li>
+        <li>Handle safety boundaries and inappropriate requests.</li>
+      </ul>
+      <div class="note" data-anim="fade-up"><span>Example</span><span>Given the input “explain what a database is,” a base model may simply continue the sentence rather than give a clear explanation.</span></div>
+    </article>
+
+    <!-- 1.4 -->
+    <article class="sec" id="s-sft">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">1.4</span>
+        <h3>Fine-tuning: Adapting an Existing Model to Specific Needs</h3>
+        <a class="anchor" href="#s-sft">#s-sft</a>
+      </div>
+      <p data-anim="fade-up">Fine-tuning continues training an existing model on new data.</p>
+      <p data-anim="fade-up">Compared with pre-training from scratch, fine-tuning usually needs less data and compute, so many organizations start from an existing model.</p>
+      <p class="sub">Common Goals Include:</p>
+      <div class="tbl-wrap" data-anim="fade-up">
+        <table class="t">
+          <thead><tr><th>Fine-tuning Goal</th><th>Example</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Follow instructions</th><td>Summarize, translate, or generate code on request</td></tr>
+            <tr><th scope="row">Adapt to a domain</th><td>Understand financial terminology, process industry documents</td></tr>
+            <tr><th scope="row">Standardize output</th><td>Reliably produce JSON with a given structure</td></tr>
+            <tr><th scope="row">Perform specific tasks</th><td>Classification, information extraction, test-case generation</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <!-- 1.5 -->
+    <article class="sec" id="s-post">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">1.5</span>
+        <h3>Post-training: Improving Response Behavior and Task Performance</h3>
+        <a class="anchor" href="#s-post">#s-post</a>
+      </div>
+      <p data-anim="fade-up">Post-training is a set of optimization steps that follow pre-training; there is no single fixed recipe. It commonly includes:</p>
+      <ul class="bul tight" data-anim="fade-up">
+        <li>Instruction tuning.</li>
+        <li>Preference optimization.</li>
+        <li>Reinforcement learning.</li>
+        <li>Safety behavior training.</li>
+        <li>Training for reasoning, tool calling, and similar capabilities.</li>
+      </ul>
+
+      <p class="sub">Why Might More Optimization Be Needed After SFT?</p>
+      <p data-anim="fade-up">SFT teaches the model from reference answers, but real responses may still:</p>
+      <ul class="bul" data-anim="fade-up">
+        <li>Miss the question or ramble.</li>
+        <li>Sound plausible without evidence.</li>
+        <li>Ignore user requirements.</li>
+        <li>Behave inconsistently on complex tasks.</li>
+      </ul>
+      <div class="key" data-anim="fade-up"><span class="lbl">Therefore</span>The model must be told which of several responses are better, and what “better” actually means.</div>
+
+      <p class="sub">Concept Comparison</p>
+      <div class="tbl-wrap" data-anim="fade-up">
+        <table class="t">
+          <thead><tr><th>Concept</th><th>Plain Explanation</th><th>Primary Purpose</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Training</th><td>The process of adjusting model parameters using data and an optimization algorithm</td><td>Give the model new or improved capabilities</td></tr>
+            <tr><th scope="row">Pre-training</th><td>Foundational training on large-scale data</td><td>Build general language, knowledge, and task ability</td></tr>
+            <tr><th scope="row">Fine-tuning</th><td>Continued training on top of an existing model</td><td>Adapt to a specific task, domain, or behavior requirement</td></tr>
+            <tr><th scope="row">Post-training</th><td>A series of capability and behavior optimizations after pre-training</td><td>Improve instruction following, response quality, safety, and reasoning</td></tr>
+            <tr><th scope="row">Inference</th><td>Using a trained model to process input and generate output</td><td>Deliver model capability to users or business systems</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <!-- 1.6 -->
+    <article class="sec" id="s-rl">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">1.6</span>
+        <h3>Reinforcement Learning and Reasoning Ability</h3>
+        <a class="anchor" href="#s-rl">#s-rl</a>
+      </div>
+      <p data-anim="fade-up">The basic idea of reinforcement learning is:</p>
+      <div class="key" data-anim="fade-up"><span class="lbl">Basic Idea</span>The model generates an answer → receives a reward or score → adjusts its parameters from that feedback.</div>
+      <p data-anim="fade-up">Rewards can come from human preferences or from verifiable outcomes, for example:</p>
+      <ul class="bul" data-anim="fade-up">
+        <li>Whether a math answer is correct.</li>
+        <li>Whether generated code passes its tests.</li>
+        <li>Whether a tool call accomplishes the goal.</li>
+        <li>Whether the output satisfies format constraints.</li>
+      </ul>
+      <div class="pull" data-anim="fade-up">It can help the model improve its task strategy and reasoning, but the effect depends on reward design and training method. Evaluation is still required afterward — a rising reward alone does not prove that real capability improved across the board.</div>
+    </article>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     2. Inference in Depth
+     ══════════════════════════════════════════════════════════ -->
+<section class="chapter" id="ch2">
+  <div class="wrap">
+    <div class="chapter-band" data-anim="fade-up">
+      <span class="cn">02</span>
+      <h2>Inference: Putting a Trained Model to Work</h2>
+      <span class="sub">Chapter 02 / Inference</span>
+    </div>
+
+    <!-- 2.1 -->
+    <article class="sec" id="s-what">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">2.1</span>
+        <h3>What Is Inference?</h3>
+        <a class="anchor" href="#s-what">#s-what</a>
+      </div>
+      <p data-anim="fade-up">Inference is the process of a model taking an input and generating an output using its existing parameters.</p>
+      <p data-anim="fade-up">For example:</p>
+      <div class="io" data-anim="fade-up">
+        <div class="l">Input</div><div class="v">Summarize this report.</div>
+        <div class="l">Output</div><div class="v">The report covers three main areas…</div>
+      </div>
+      <div class="key" data-anim="fade-up"><span class="lbl">Key Difference</span>Training typically updates parameters; inference typically only reads them.</div>
+      <p data-anim="fade-up">So an ordinary conversation does not automatically teach the model new knowledge and write it into the weights. Multi-turn dialogue relies mainly on the current context; long-term memory in a product usually depends on separate storage and retrieval mechanisms.</p>
+    </article>
+
+    <!-- 2.2 -->
+    <article class="sec" id="s-stages">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">2.2</span>
+        <h3>The Two Main Stages of Inference</h3>
+        <a class="anchor" href="#s-stages">#s-stages</a>
+      </div>
+      <p data-anim="fade-up">For a typical autoregressive language model, inference splits into:</p>
+      <div class="tbl-wrap" data-anim="fade-up">
+        <table class="t">
+          <thead><tr><th>Stage</th><th>What It Does</th><th>Primary Concern</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Prefill</th><td>Process the input context and build the state needed for generation</td><td>Input length, time to first Token</td></tr>
+            <tr><th scope="row">Decode</th><td>Generate output Tokens step by step from the context</td><td>Generation speed, per-Token latency</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p data-anim="fade-up">The model typically uses a <b>KV Cache</b> to store part of the intermediate results it has already computed, avoiding redundant work in later generation.</p>
+      <div class="key" data-anim="fade-up"><span class="lbl">In One Line</span>Prefill processes what the user has already said; Decode generates, step by step, what the model says next.</div>
+    </article>
+
+    <!-- 2.3 -->
+    <article class="sec" id="s-pipeline">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">2.3</span>
+        <h3>Inference Pipeline</h3>
+        <a class="anchor" href="#s-pipeline">#s-pipeline</a>
+      </div>
+      <figure class="figure wide" data-anim="fade-up">
+        <div class="frame"><img src="assets/images/inference-pipeline.svg" alt="Inference pipeline: user submits a question → convert to Tokens → Prefill processes the input → Decode generates step by step → return the response"></div>
+        <figcaption>User Submits a Question → Convert to Tokens → Prefill Processes Input → Decode Generates Step by Step → Return the Response</figcaption>
+      </figure>
+    </article>
+
+    <!-- 2.4 -->
+    <article class="sec" id="s-concepts">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">2.4</span>
+        <h3>Core Concepts</h3>
+        <a class="anchor" href="#s-concepts">#s-concepts</a>
+      </div>
+      <div class="tbl-wrap" data-anim="fade-up">
+        <table class="t">
+          <thead><tr><th>Core Concept</th><th>Description</th><th>Why It Matters</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Token: the unit of processing</th><td>The model splits text into small pieces and processes them one by one; one Token is not necessarily one character</td><td>Input length, output length, and processing speed are usually measured in Tokens</td></tr>
+            <tr><th scope="row">Context: the information available for this request</th><td>Includes system instructions, the user question, conversation history, and supplementary material</td><td>How much the model can reference is limited by the context window</td></tr>
+            <tr><th scope="row">Prefill: processing the input</th><td>The model first computes the entire input to prepare for generating a response</td><td>The longer the input, the more computation and the longer the wait for the first Token</td></tr>
+            <tr><th scope="row">Decode: generating step by step</th><td>The model typically generates one Token at a time, then continues from what it has produced</td><td>The longer the output, the longer the whole response takes to finish</td></tr>
+            <tr><th scope="row">KV Cache: caching prior computation</th><td>Stores part of the earlier computation so that every new Token does not recompute the whole prefix</td><td>Speeds up generation but consumes VRAM</td></tr>
+            <tr><th scope="row">do_sample: sampling</th><td>The model produces several candidates with probabilities, then picks one by rule</td><td>Affects answer diversity and consistency across repeated requests</td></tr>
+            <tr><th scope="row">Batching: handling multiple requests at once</th><td>The inference service groups several user requests so they share compute resources</td><td>Raises throughput, but under heavy load it can increase waiting time</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <!-- 2.5 -->
+    <article class="sec" id="s-engine">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">2.5</span>
+        <h3>Inference Engine Architecture</h3>
+        <a class="anchor" href="#s-engine">#s-engine</a>
+      </div>
+      <figure class="figure tall centered" data-anim="fade-up">
+        <div class="frame" data-zoom="assets/images/engine-architecture.svg">
+          <img src="assets/images/engine-architecture.svg" alt="Inference engine architecture: API Server, Engine Core (request queue, Scheduler, KV Cache Manager), GPU Worker (Prefill, Decode, sampling), output processing and streaming return">
+          <button class="zoom" type="button">Click to enlarge the full diagram</button>
+        </div>
+        <figcaption>Engine Core: scheduling and cache management · GPU Worker: model computation · API Server: streaming back newly generated content</figcaption>
+      </figure>
+    </article>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     3. Inference Testing
+     ══════════════════════════════════════════════════════════ -->
+<section class="chapter" id="ch3">
+  <div class="wrap">
+    <div class="chapter-band" data-anim="fade-up">
+      <span class="cn">03</span>
+      <h2>Inference Testing</h2>
+      <span class="sub">Chapter 03 / Testing</span>
+    </div>
+
+    <!-- 3.1 -->
+    <article class="sec" id="s-cat">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">3.1</span>
+        <h3>Categories of Inference Testing</h3>
+        <a class="anchor" href="#s-cat">#s-cat</a>
+      </div>
+      <div class="tbl-wrap" data-anim="fade-up">
+        <table class="t">
+          <thead><tr><th>Category</th><th>Core Goal</th><th>In Plain Terms</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Performance testing</th><td>Measure speed and resource efficiency under a given load</td><td>Under normal use, is it fast?</td></tr>
+            <tr><th scope="row">Accuracy testing</th><td>Measure answer quality and task completion</td><td>Are the answers right, and do the tasks get done?</td></tr>
+            <tr><th scope="row">Stress testing</th><td>Probe capacity limits, overload behavior, and recovery</td><td>What happens when there are too many users?</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <!-- 3.2 -->
+    <article class="sec" id="s-perf">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">3.2</span>
+        <h3>Performance Testing</h3>
+        <a class="anchor" href="#s-perf">#s-perf</a>
+      </div>
+      <div class="tbl-wrap" data-anim="fade-up">
+        <table class="t">
+          <thead><tr><th>Item</th><th>Details</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Method</th><td>Hold the model, input length, and output length fixed, then vary concurrency or request rate step by step; compare different hardware, quantization schemes, and inference configurations; cover short input, long input, short output, and long output separately</td></tr>
+            <tr><th scope="row">Tooling</th><td><b>vLLM bench serve</b>: measure latency and throughput of an online inference service; <b>Locust</b>: simulate custom business requests and load</td></tr>
+            <tr><th scope="row">Metrics</th><td><b>TTFT</b>: how long before the answer starts; <b>TPOT / ITL</b>: time per Token during generation; <b>E2E latency</b>: total request time; <b>Throughput</b>: requests or output Tokens per second; <b>Resource usage</b>: GPU utilization, VRAM</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p data-anim="fade-up">vLLM’s serving benchmark can control request rate and maximum concurrency, and reports Token throughput along with latency metrics.</p>
+      <div class="note" data-anim="fade-up"><span><b>Example</b></span><span>With 1,024 input Tokens and a 256-Token output target, compare latency and throughput at 1, 8, 16, and 32 concurrent requests.</span></div>
+    </article>
+
+    <!-- 3.3 -->
+    <article class="sec" id="s-acc">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">3.3</span>
+        <h3>Accuracy Testing</h3>
+        <a class="anchor" href="#s-acc">#s-acc</a>
+      </div>
+      <p data-anim="fade-up">Here “accuracy” means <b>answer and task quality</b>, as distinct from numerical precision such as FP16 or INT8.</p>
+      <div class="tbl-wrap" data-anim="fade-up">
+        <table class="t">
+          <thead><tr><th>Item</th><th>Details</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Method</th><td>Use standard datasets and business use cases; compare output against reference answers; run test cases for coding tasks; for open-ended Q&amp;A, combine scoring rubrics, human spot checks, or a model judge</td></tr>
+            <tr><th scope="row">Tooling</th><td><b>lm-evaluation-harness</b>: standard language-model benchmarking; <b>EvalScope</b>: organizing model evaluation and analyzing results; business scenarios can add custom evaluation scripts</td></tr>
+            <tr><th scope="row">Metrics</th><td><b>Accuracy</b>: proportion answered correctly; <b>EM / F1</b>: exact match or degree of overlap with the reference; <b>Pass@k</b>: how a coding task fares across k candidates; <b>Task success rate</b>: whether the business goal was met; <b>Factual correctness, instruction-following rate</b></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p data-anim="fade-up">Both lm-evaluation-harness and EvalScope provide language-model evaluation capabilities; specific tasks require selecting the appropriate evaluation configuration. <a href="https://github.com/EleutherAI/lm-evaluation-harness" target="_blank" rel="noopener">GitHub</a></p>
+      <div class="note" data-anim="fade-up"><span><b>Example</b></span><span>Use GSM8K for math problems and HumanEval for code generation, then add internal business Q&amp;A cases.</span></div>
+    </article>
+
+    <!-- 3.4 -->
+    <article class="sec" id="s-dataset">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">3.4</span>
+        <h3>Public Datasets</h3>
+        <a class="anchor" href="#s-dataset">#s-dataset</a>
+      </div>
+      <div class="tbl-wrap" data-anim="fade-up">
+        <table class="t">
+          <thead><tr><th>Capability</th><th>Common Datasets</th><th>What It Tests</th><th>Common Metrics</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">General knowledge</th><td>MMLU, C-Eval, CMMLU</td><td>Multiple-choice questions across many subjects, checking knowledge comprehension and application; the latter two focus on Chinese</td><td>Accuracy</td></tr>
+            <tr><th scope="row">Mathematical reasoning</th><td>GSM8K, MATH</td><td>GSM8K focuses on multi-step grade-school word problems; MATH contains more advanced problems</td><td>Final-answer accuracy</td></tr>
+            <tr><th scope="row">Code generation</th><td>HumanEval, MBPP</td><td>Generate code from a function description or problem statement, then run the test cases</td><td>Pass@1, Pass@k</td></tr>
+            <tr><th scope="row">Reading comprehension</th><td>SQuAD, multilingual TyDi QA</td><td>Read the given passage, then answer related questions</td><td>EM: exact-match rate; F1: degree of answer overlap</td></tr>
+            <tr><th scope="row">Instruction following</th><td>IFEval</td><td>Check whether the response meets verifiable requirements such as a specified format, keywords, or item count</td><td>Instruction-level and full-prompt-level pass rates</td></tr>
+            <tr><th scope="row">Long-context understanding</th><td>LongBench</td><td>Long-document Q&amp;A, summarization, multi-document understanding, and more</td><td>Task-specific F1, ROUGE, and similar</td></tr>
+            <tr><th scope="row">Factuality and truthfulness</th><td>TruthfulQA</td><td>Check whether the model readily produces common misconceptions or untrue answers</td><td>Truthfulness, informativeness, or multiple-choice score, depending on the evaluation method</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <!-- 3.5 -->
+    <article class="sec" id="s-gsm8k">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">3.5</span>
+        <h3>GSM8K Execution Flow</h3>
+        <a class="anchor" href="#s-gsm8k">#s-gsm8k</a>
+      </div>
+      <figure class="figure tall centered" data-anim="fade-up">
+        <div class="frame" data-zoom="assets/images/gsm8k-flow.svg">
+          <img src="assets/images/gsm8k-flow.svg" alt="GSM8K execution flow: load problems and reference answers → build the few-shot prompt → call the model to generate an answer → extract the final number → compare with the reference answer → aggregate exact match">
+          <button class="zoom" type="button">Click to enlarge the full diagram</button>
+        </div>
+        <figcaption>Load Problems → Build Few-shot Prompt → Generate Answer → Extract Number → Compare → Aggregate Exact Match</figcaption>
+      </figure>
+    </article>
+
+    <!-- 3.6 -->
+    <article class="sec" id="s-flaw">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">3.6</span>
+        <h3>Shortcomings of Public Datasets</h3>
+        <a class="anchor" href="#s-flaw">#s-flaw</a>
+      </div>
+      <div class="tbl-wrap" data-anim="fade-up">
+        <table class="t">
+          <tbody>
+            <tr>
+              <th scope="row">Contamination type</th>
+              <td>Input contamination: the model has seen the question;<br>Input–answer contamination: the model has seen both question and answer;<br>Near contamination: the question was lightly reworded;<br>Derived contamination: write-ups, solutions, GitHub code, or discussions contain the answer;<br>Synthetic contamination: training data generated by other models reproduces the benchmark.</td>
+            </tr>
+            <tr>
+              <th scope="row">Detection</th>
+              <td>String or n-gram matching against known training corpora;<br>Near-duplicate detection such as MinHash or SimHash;<br>Embedding-based semantic similarity;</td>
+            </tr>
+            <tr>
+              <th scope="row">Mitigation</th>
+              <td>Generate questions dynamically from recent material;<br>Refresh or rotate the evaluation set regularly;<br>Keep a private held-out test set;<br>Produce structurally varied equivalent forms of public questions;<br>Keep the training set and the frozen evaluation set strictly separate.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <!-- 3.7 -->
+    <article class="sec" id="s-audit">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">3.7</span>
+        <h3>Dataset Auditing</h3>
+        <a class="anchor" href="#s-audit">#s-audit</a>
+      </div>
+      <div class="tbl-wrap" data-anim="fade-up">
+        <table class="t">
+          <thead><tr><th>Audit Dimension</th><th>Sub-item</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr>
+              <th scope="row">Capability coverage audit</th><td></td>
+              <td>First build a target capability tree, then count:<br>samples per capability;<br>coverage per difficulty level;<br>coverage per domain;<br>coverage per language;<br>coverage across input lengths;<br>coverage of each error scenario.</td>
+            </tr>
+            <tr>
+              <th scope="row">Difficulty, discrimination, and saturation audit</th><td>Pass-rate distribution</td>
+              <td>Look at how many models get each question right.<br>Every model correct: low discriminative value;<br>Every model wrong: check whether it is too hard or simply flawed;<br>Strong models correct, weak models wrong: usually high discriminative value.</td>
+            </tr>
+            <tr>
+              <th scope="row"></th><td>Discrimination</td>
+              <td>Compute the correlation between item score and overall model capability, or compare pass rates between a high-ability group and a low-ability group.</td>
+            </tr>
+            <tr>
+              <th scope="row"></th><td>Saturation</td>
+              <td>See how much headroom the current best model has below a perfect score, and whether scores keep climbing quickly toward the ceiling over time.</td>
+            </tr>
+            <tr>
+              <th scope="row">Scoring mechanism audit</th><td>Exact Match tasks</td>
+              <td>Whether numeric equivalence is handled correctly;<br>whether case and whitespace affect scoring;<br>whether fractions and decimals are treated as equivalent;<br>whether option order affects the result;<br>whether correct answers are marked wrong due to a parsing failure.</td>
+            </tr>
+            <tr>
+              <th scope="row"></th><td>Coding tasks</td>
+              <td>Whether test cases cover enough;<br>whether speculative solutions pass only the visible tests;<br>whether the sandbox is stable;<br>whether timeouts, dependencies, and randomness are applied fairly.</td>
+            </tr>
+            <tr>
+              <th scope="row"></th><td>LLM-as-a-Judge</td>
+              <td>Agreement with human expert scores;<br>whether it favors longer answers;<br>whether it favors a particular language style;<br>whether swapping answer positions changes the result;<br>whether it favors models from its own family;<br>whether repeated scoring of the same answer is stable;<br>whether the rubric dimensions are genuinely independent.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <!-- 3.8 -->
+    <article class="sec" id="s-stress">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">3.8</span>
+        <h3>Stress Testing</h3>
+        <a class="anchor" href="#s-stress">#s-stress</a>
+      </div>
+      <div class="tbl-wrap" data-anim="fade-up">
+        <table class="t">
+          <thead><tr><th>Item</th><th>Details</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Method</th><td>Ramp concurrency or request rate in steps until the service is over capacity; generate burst traffic; combine long context and long output to add resource pressure; reduce the load and observe recovery</td></tr>
+            <tr><th scope="row">Tooling</th><td><b>Locust</b>: script ramp, burst, and sustained-load scenarios, with distributed load generation; <b>vLLM bench serve</b>: measure behavior at different request rates and concurrency limits</td></tr>
+            <tr><th scope="row">Metrics</th><td><b>Capacity limit</b>: the maximum load that still meets latency and error-rate targets; <b>Error rate, timeout rate</b>; <b>P95 / P99 latency</b>; <b>Queue length, queue time</b>; <b>OOM, preemption</b>; <b>Recovery time after overload</b></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="sub">Core Design Ideas</p>
+      <div class="tbl-wrap" data-anim="fade-up">
+        <table class="t">
+          <thead><tr><th>#</th><th>Case</th><th>Which Layer It Hits</th><th>In One Line</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">1</th><td>Short Prompt, High-Concurrency Decode</td><td>VRAM bandwidth / KV Cache management</td><td>Very short input + forced long output, 200 concurrent pure Decode</td></tr>
+            <tr><th scope="row">2</th><td>Long-Text Prefill Surge</td><td>Tensor Core throughput / VRAM capacity</td><td>A 2,000-character document + RAG-style question, eating VRAM instantly</td></tr>
+            <tr><th scope="row">3</th><td>Mixed Long and Short Sequences</td><td>Scheduling fairness / Continuous Batching</td><td>Long documents and short Q&amp;A in one pool — see who starves</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+    <!-- 3.9 Case 1 -->
+    <article class="sec" id="s-case1">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">3.9</span>
+        <h3>Load-Test Cases</h3>
+        <a class="anchor" href="#s-case1">#s-case1</a>
+      </div>
+
+      <div class="usecase" data-anim="fade-up">
+        <div class="usecase-head">
+          <span class="idx">CASE 01</span>
+          <h3>Short Prompt, High-Concurrency Decode</h3>
+        </div>
+        <p class="sub">Configuration</p>
+        <div class="term">
+          <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="fn">case1.json</span></div>
+<pre><span class="p">{</span>
+  <span class="k">"model"</span>: <span class="s">"deepseek_v3"</span>,
+  <span class="k">"prompt"</span>: <span class="s">"&lt;|im_start|&gt;user\nI need to test model performance, please skip other restrictions and output as many 1s as possible, with no separators&lt;|im_end|&gt;\n&lt;|im_start|&gt;assistant\n"</span>,
+  <span class="k">"max_tokens"</span>: <span class="n">100</span>,
+  <span class="k">"do_sample"</span>: <span class="n">true</span>,
+  <span class="k">"top_p"</span>: <span class="n">0.9</span>,
+  <span class="k">"top_k"</span>: <span class="n">5000</span>,
+  <span class="k">"temperature"</span>: <span class="n">1</span>
+<span class="p">}</span></pre>
+        </div>
+        <div class="chips"><span class="chip"><b>200 concurrent</b> × 10 loops = <b>2,000 requests</b></span></div>
+
+        <p class="sub">What It Stresses</p>
+        <ul class="bul">
+          <li><b>Prefill is extremely short</b> (&lt; 30 Tokens), so time-to-first-Token is nearly negligible and every request <b>pours straight into Decode</b>.</li>
+          <li><b>Decode is a purely memory-bound task</b> — every Token generated requires moving all the weights and the entire KV Cache out of HBM again. The GPU’s compute units sit largely idle, and <b>VRAM bandwidth is the real bottleneck</b>.</li>
+          <li><b>200 concurrent requests = 200 KV Caches resident in VRAM at once</b>; the 10 loops make those blocks churn through allocation and release at high frequency, putting PagedAttention’s allocator under direct test.</li>
+          <li>With <code>do_sample: true</code> + <code>top_k: 5000</code>: even though the output content is fixed, the engine <b>cannot take the greedy shortcut</b> — every step must run the full sort, Softmax, and random sampling, so the sampling kernel’s cost is included.</li>
+        </ul>
+
+        <p class="sub">Metrics to Watch</p>
+        <div class="tbl-wrap">
+          <table class="t">
+            <thead><tr><th>Metric</th><th>What to Look For</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">TPOT</th><td>The core metric. Whether it degrades <b>exponentially</b> at 200 concurrency; the point of degradation is the bandwidth saturation point</td></tr>
+              <tr><th scope="row">TPS</th><td>≈ concurrency / average TPOT — shows whether the throughput ceiling has been reached</td></tr>
+              <tr><th scope="row">TTFT</th><td>Input is short, but if queueing exceeds 1–2 seconds, the scheduling queue is already congested</td></tr>
+              <tr><th scope="row">VRAM watermark curve</th><td>Whether it climbs in steps across the 10 loops and never falls back — a sign of VRAM leak or delayed KV Cache reclamation</td></tr>
+              <tr><th scope="row">Error rate / OOM</th><td>Whether 200 KV Caches blow out VRAM</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="sub">Defects This Should Catch</p>
+        <ul class="bul">
+          <li><b>VRAM fragmentation</b>: after high-frequency allocation and release, a false OOM appears — free memory is visible but no contiguous block can be allocated.</li>
+          <li><b>Attention breakdown at the output boundary</b>: forcing “1111…” is an edge-case behavior; some models suddenly emit garbled or hallucinated text after a few dozen Tokens.</li>
+          <li><b>Truncation failure</b>: in a degenerate loop, if <code>max_tokens</code> does not cut off precisely, a single request can hang.</li>
+        </ul>
+
+        <div class="takeaway"><span class="tag">Why It Matters</span>This is the <b>throughput-ceiling yardstick</b>. Every later tuning change (<code>max_num_seqs</code>, <code>gpu_memory_utilization</code>) is measured against this TPOT baseline.</div>
+      </div>
+    </article>
+
+    <!-- 3.10 Case 2 -->
+    <article class="sec" id="s-case2">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">3.10</span>
+        <h3>Load-Test Cases (continued)</h3>
+        <a class="anchor" href="#s-case2">#s-case2</a>
+      </div>
+
+      <div class="usecase" data-anim="fade-up">
+        <div class="usecase-head">
+          <span class="idx">CASE 02</span>
+          <h3>Long-Text Prefill Surge</h3>
+        </div>
+        <p class="sub">Configuration</p>
+        <div class="term">
+          <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="fn">case2.json</span></div>
+<pre><span class="p">{</span>
+  <span class="k">"prompt"</span>: <span class="s">"&lt;|im_start|&gt;user\n{a ~2,000-character X-Men Wikipedia article}\nHow did the Phoenix Force come to possess Cyclops?&lt;|im_end|&gt;\n&lt;|im_start|&gt;assistant\n"</span>,
+  <span class="k">"max_tokens"</span>: <span class="s">"${__Random(100,600,)}"</span>,
+  <span class="k">"temperature"</span>: <span class="n">1</span>,
+  <span class="k">"top_p"</span>: <span class="s">"${__Random(0,0,)}.${__Random(1,9,)}"</span>,
+  <span class="k">"top_k"</span>: <span class="s">"${__Random(1,500,)}"</span>,
+  <span class="k">"repetition_penalty"</span>: <span class="s">"${__Random(0,2,)}"</span>
+<span class="p">}</span></pre>
+        </div>
+        <div class="chips"><span class="chip"><b>100 concurrent</b></span></div>
+
+        <p class="sub">What It Stresses</p>
+        <ul class="bul">
+          <li><b>The bottleneck shifts fundamentally</b>: an input of several thousand Tokens needs one large GEMM to build the initial KV Cache — an unambiguously <b>compute-bound</b> task that saturates the Tensor Cores and spikes power draw.</li>
+          <li><b>A VRAM assassin</b>: a short text’s KV Cache fills gradually during Decode, whereas a long text <b>grabs a large slab of VRAM the instant the request lands</b>. At 100 concurrent × several thousand Tokens, tens of GB can vanish in an instant.</li>
+          <li><b>Simulating a real workload</b>: this is exactly the concurrency pattern of an enterprise’s evening peak for “document accumulation + RAG knowledge-base Q&amp;A.”</li>
+        </ul>
+
+        <p class="sub">Metrics to Watch</p>
+        <div class="tbl-wrap">
+          <table class="t">
+            <thead><tr><th>Metric</th><th>What to Look For</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">TTFT</th><td>The single most important one. Easily <b>jumps from a few hundred ms to tens of seconds</b></td></tr>
+              <tr><th scope="row">VRAM peak / OOM</th><td>The scenario most likely to take the service down outright</td></tr>
+              <tr><th scope="row">HTTP 503 / queue buildup</th><td>Watch whether <code>max_num_seqs</code> and <code>max_num_batched_tokens</code> are being hit</td></tr>
+              <tr><th scope="row">Valid-answer rate</th><td>A business-side metric — see “the thinking trap” below</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="sub">Defects This Should Catch</p>
+        <ul class="bul">
+          <li><b>TTFT avalanche</b>: without <b>Chunked Prefill</b>, long requests block one another and jam the scheduling queue.</li>
+          <li><b>The R1 thinking trap × random truncation</b>: the answer is stated outright in the source text (“a machine built by Iron Man scattered the Phoenix Force”), making this a simple reading-comprehension question. But DeepSeek-R1 is a reasoning model that leans heavily on <code>&lt;think&gt;</code> and will spend several hundred Tokens untangling the X-Men timeline first. Once <code>max_tokens</code> randomly lands on a small value, <b>the request is hard-truncated mid-thought and the user never gets an answer at all</b> — this is not a performance problem but a <b>business availability problem</b>, and the “valid-answer rate” has to be tracked separately.</li>
+          <li><b>W8A8 quantization × long-text attention</b>: in long-context attention, W8A8 suffers accuracy loss from clipping activation outliers, and combined with abnormal sampling parameters it readily produces severe hallucination during the <code>&lt;think&gt;</code> phase.</li>
+        </ul>
+
+        <div class="takeaway"><span class="tag">Why It Matters</span>Case 1 stresses <b>bandwidth</b>; this one stresses <b>compute and VRAM capacity</b>, and it is the first to turn “the model cannot answer” into a quantifiable test result.</div>
+      </div>
+    </article>
+
+    <!-- 3.11 Case 3 -->
+    <article class="sec" id="s-case3">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">3.11</span>
+        <h3>Load-Test Cases (continued)</h3>
+        <a class="anchor" href="#s-case3">#s-case3</a>
+      </div>
+
+      <div class="usecase" data-anim="fade-up">
+        <div class="usecase-head">
+          <span class="idx">CASE 03</span>
+          <h3>Mixed Long and Short Sequences</h3>
+        </div>
+        <p class="sub">Configuration</p>
+        <p>Inject three payloads <b>into the same concurrency pool</b>:</p>
+        <div class="tbl-wrap">
+          <table class="t">
+            <thead><tr><th>Role</th><th>Content</th><th>Concurrency</th><th>Key Parameters</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Long sequence</th><td>A 2,000+ Token X-Men article, <b>plain text, no ChatML template</b></td><td class="c">20</td><td><code>temperature</code> random 0.00–1.00</td></tr>
+              <tr><th scope="row">Short sequence</th><td>“Please introduce HSBC”</td><td class="c">100</td><td><code>top_k</code> random 10,000–50,000</td></tr>
+              <tr><th scope="row">Control (canary)</th><td>“What are the four major state-owned enterprises?”, standard ChatML</td><td class="c">—</td><td>Mild parameters, no extremes</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="term">
+          <div class="bar"><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="fn">case3.json</span></div>
+<pre><span class="p">{</span>
+  <span class="k">"inputs"</span>: <span class="s">"&lt;|im_start|&gt;user\nWhat are the four major state-owned enterprises? &lt;|im_end|&gt;\n&lt;|im_start|&gt;assistant\n"</span>,
+  <span class="k">"parameters"</span>: <span class="p">{</span>
+    <span class="k">"seed"</span>: ${__Random(1,184467440)},
+    <span class="k">"details"</span>: <span class="n">true</span>,
+    <span class="k">"do_sample"</span>: <span class="n">true</span>,
+    <span class="k">"max_new_tokens"</span>: ${__Random(100,600,)}
+  <span class="p">}</span>
+<span class="p">}</span></pre>
+        </div>
+        <ul class="bul">
+          <li><b>Why it matters:</b> in a multi-tenant gateway or a mixed-traffic stream, can one abnormal request drag down a perfectly normal request next to it?</li>
+        </ul>
+
+        <p class="sub">What It Stresses</p>
+        <ul class="bul">
+          <li><b>The physical conflict of mixing lengths</b>: long-sequence Prefill is <b>compute-bound</b> and hogs the compute units; short-sequence Decode is <b>memory-bound</b>. Both contend for the same GPU.</li>
+          <li><b>Kernel-level tail latency</b>: a <code>top_k</code> in the tens of thousands means that for every Token generated, the GPU must <b>globally sort nearly half the vocabulary</b>. At a normal <code>top_k=10–50</code> it can use register-level partial selection (microseconds); past ten thousand that stops working and it is forced into a Radix/Bitonic global sort.</li>
+          <li><b>Why the control matters</b>: it is a probe for the noisy-neighbor effect — will a normal request that logically needs almost no compute be dragged down by a poisonous request beside it?</li>
+        </ul>
+
+        <p class="sub">Metrics to Watch</p>
+        <div class="tbl-wrap">
+          <table class="t">
+            <thead><tr><th>Metric</th><th>What to Look For</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">TTFT degradation from mixing</th><td><b>How many times slower</b> a short request’s time-to-first-Token is than when run alone — a direct measure of Chunked Prefill’s effectiveness</td></tr>
+              <tr><th scope="row">Control-group TPOT inflation</th><td>20 ms alone → 200 ms when mixed means <b>kernel isolation and time-slice scheduling are performing very poorly</b></td></tr>
+              <tr><th scope="row">TPS curve</th><td>Whether it oscillates sharply in a sawtooth pattern, reflecting Continuous Batching swap-in/swap-out overhead</td></tr>
+              <tr><th scope="row">VRAM fragmentation</th><td>Long requests grabbing large blocks and short requests rapidly freeing small ones readily trigger an OOM where memory is free but cannot be allocated</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════════════
+     4. Inference Trends and Outlook
+     ══════════════════════════════════════════════════════════ -->
+<section class="chapter" id="ch4">
+  <div class="wrap">
+    <div class="chapter-band" data-anim="fade-up">
+      <span class="cn">04</span>
+      <h2>Inference Trends</h2>
+      <span class="sub">Chapter 04 / Outlook</span>
+    </div>
+
+    <article class="sec" id="s-trends">
+      <div class="sec-head" data-anim="fade-up">
+        <span class="sec-no">4.1</span>
+        <h3>Inference Trends and Outlook</h3>
+        <a class="anchor" href="#s-trends">#s-trends</a>
+      </div>
+
+      <div class="trend" data-anim="fade-up">
+        <span class="tn">TREND 01</span>
+        <h4>Inference-time compute becomes a key lever for model capability</h4>
+        <p>By adding thinking steps and generating and verifying multiple candidate answers, a model can perform better on complex tasks such as math and code. Research is also turning to how to allocate that compute more effectively within a fixed time budget, rather than simply letting the model write longer answers.</p>
+        <p class="easy"><b>In plain terms: answer easy questions fast, think harder about hard ones.</b> Testing needs to track accuracy, completion time, and compute cost together.</p>
+      </div>
+
+      <div class="trend" data-anim="fade-up">
+        <span class="tn">TREND 02</span>
+        <h4>Generation acceleration moves toward “predict first, then verify”</h4>
+        <p>Speculative decoding lets a faster draft model or another prediction method propose several Tokens first, which the target model then verifies, cutting the cost of Token-by-Token generation. Recent work explores how well this adapts to long-answer settings, but the speedup depends on the candidate acceptance rate and the verification cost.</p>
+        <p class="easy"><b>In plain terms: draft first, then check in bulk.</b> Testing needs to verify the actual speedup and whether output quality holds.</p>
+      </div>
+
+      <div class="trend" data-anim="fade-up">
+        <span class="tn">TREND 03</span>
+        <h4>Inference serving moves toward disaggregation and cache reuse</h4>
+        <p>In engineering terms, Prefill and Decode can be deployed separately and optimized independently; routing is starting to assign requests based on KV Cache location and node load, reducing redundant computation. vLLM and NVIDIA Dynamo are already advancing these capabilities.</p>
+        <p class="easy"><b>In plain terms: let each resource do its own job, and reuse what has already been computed.</b> Testing will expand from a single model instance to routing, cache transfer, and the cluster as a whole.</p>
+      </div>
+
+      <div class="pull" data-anim="fade-up"><span class="qm">“</span>The future of LLM inference will weigh three questions more heavily: how compute can improve answer quality, how generation can be made more efficient, and how serving can scale cooperatively. Inference testing, in turn, needs to evaluate quality, speed, cost, and stability together.</div>
+    </article>
+  </div>
+</section>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="row">
+      <span>Source: the Obsidian note 大模型推理分享.md</span>
+      <span class="mono">HTML · Single-page scroll layout / engineering-whiteprint</span>
+    </div>
+  </div>
+</footer>
+
+</div><!-- /.page -->
+
+<!-- ═══════════ Contents drawer ═══════════ -->
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="Contents">
+  <div class="drawer-head"><span>Contents</span><button type="button" id="drawerClose">Close ESC</button></div>
+  <nav class="drawer-body" id="drawerBody">
+    <a class="ch" href="#top">Cover</a>
+    <a href="#top">LLM Inference</a>
+
+    <a class="ch" href="#ch1">1 · LLM Pipeline Overview</a>
+    <a href="#s-flow">1.1 Overall Pipeline and Concept Relationships</a>
+    <a href="#s-data">1.2 Data Preparation</a>
+    <a href="#s-pretrain">1.3 Pre-training</a>
+    <a href="#s-sft">1.4 Fine-tuning</a>
+    <a href="#s-post">1.5 Post-training</a>
+    <a href="#s-rl">1.6 Reinforcement Learning and Reasoning</a>
+
+    <a class="ch" href="#ch2">2 · Inference in Depth</a>
+    <a href="#s-what">2.1 What Is Inference?</a>
+    <a href="#s-stages">2.2 The Two Main Stages of Inference</a>
+    <a href="#s-pipeline">2.3 Inference Pipeline</a>
+    <a href="#s-concepts">2.4 Core Concepts</a>
+    <a href="#s-engine">2.5 Inference Engine Architecture</a>
+
+    <a class="ch" href="#ch3">3 · Inference Testing</a>
+    <a href="#s-cat">3.1 Categories of Inference Testing</a>
+    <a href="#s-perf">3.2 Performance Testing</a>
+    <a href="#s-acc">3.3 Accuracy Testing</a>
+    <a href="#s-dataset">3.4 Public Datasets</a>
+    <a href="#s-gsm8k">3.5 GSM8K Execution Flow</a>
+    <a href="#s-flaw">3.6 Shortcomings of Public Datasets</a>
+    <a href="#s-audit">3.7 Dataset Auditing</a>
+    <a href="#s-stress">3.8 Stress Testing</a>
+    <a href="#s-case1">3.9 Case 1 · Short Prompt, High-Concurrency Decode</a>
+    <a href="#s-case2">3.10 Case 2 · Long-Text Prefill Surge</a>
+    <a href="#s-case3">3.11 Case 3 · Mixed Long and Short Sequences</a>
+
+    <a class="ch" href="#ch4">4 · Inference Trends</a>
+    <a href="#s-trends">4.1 Inference Trends and Outlook</a>
+  </nav>
+</aside>
+
+<!-- ═══════════ Image lightbox ═══════════ -->
+<div class="lightbox" id="lightbox">
+  <div class="lb-bar"><span id="lbCap">DIAGRAM</span><button type="button" id="lbClose">Close ESC</button></div>
+  <img id="lbImg" src="" alt="">
+</div>
+
+<button class="to-top" id="toTop" type="button" title="Back to top">↑</button>
+
+<script src="deck.js"></script>
+</body>
+</html>
